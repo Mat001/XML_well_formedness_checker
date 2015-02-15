@@ -4,7 +4,7 @@
     This project is a program to validate well-formdness of XML files.
     author: Matjaz Pirnovar
 
-    XML syntaxt rules to use in the program logic:
+    XML syntaxt rules to use in the program logic (official source: http://www.w3.org/TR/xml/#sec-well-formed):
 
     1. The first line in the document is the XML declaration should always be included.
     It defines the XML version of the document:<?xml version="1.0"?>
@@ -52,14 +52,18 @@
 
     17. Nothing but whitespace is allowed between > and < brackets (in between closing and opening tag)
 
+    18. CLosing tags don't have attributes
+
+    19. Disallowed initial characters for Names include digits, diacritics, the full stop and the hyphen.
+    (http://www.w3.org/TR/xml/#sec-well-formed)
 """
 
 
 def getstring():
-    '''
+    """
     put xml content from file into a string (also make sure you use try/except!)
     :return: xml_string
-    '''
+    """
     xml_string = ""
     with open('xml_example.txt', 'r') as f:
         for i in f:
@@ -68,130 +72,45 @@ def getstring():
 
 
 # ****************************************************************************************************
-# GET THE OPENING ROOT ELEMENT
-# ****************************************************************************************************
-
-def root_element_opening():
-    ''' Get the opening root element.
-
-        Iterate from start of the file onwards.
-        store position value when you hit first '<' character that is not part of XML declaration (no ? after '<')
-        that is the opening tag of the root element
-        WHAT ABOUT IF  '<' chars appear before the root tag '<'???? Then it doesn't work! How do I define root element and finf it???
-    '''
-    opening, closing = 0, 0
-    flag = False
-    for i, char in enumerate(getstring()):  # loop through tuple items and find the first item that has '<'.
-        # CHECK THIS: HOW CAN ? and ! APPEAR AT THE SAME TIME. CHANGE and TO or?
-        if char == '<' and getstring()[i + 1] != '?' and getstring()[i + 1] != '!':  # '!' is to ignore DTD declarations
-            opening = i
-            flag = True
-        if char == '>' and flag == True:
-            closing = i
-            content = getstring()[opening:closing + 1]
-            return content
-
-
-print('result-opening: ', root_element_opening())
-
-
-
-# ****************************************************************************************************
-#   GET THE CLOSING ROOT ELEMENT
-# ****************************************************************************************************
-
-def root_element_closing():
-    ''' Get the closing root element.
-    '''
-    for count, char in enumerate(
-            reversed(getstring())):  # loop through tuple items and find the first item that has '<'.
-        if char == '>':  # found last closing bracket in the whole file, function only as an assertion - no other mening
-            assert count == 0
-        if char == '<':  # iterate from the end and find first opening bracket
-            opening = count + 1
-            return getstring()[-opening:]  # return characters from last opening bracket to the end
-
-
-print('result-closing: ', root_element_closing())
-
-
-
-# ****************************************************************************************************
-#   COMPARE OPENING AND CLOSING ROOT ELEMENTS IF THEY MATCH
-# ****************************************************************************************************
-
-def root_element_exists_and_matches():
-    ''' Compare opening and closing root element if they match.
-    '''
-    # check if the names of the root tags match
-    # make sure that for comparison you ignore the forward slash
-    if root_element_opening() == (root_element_closing()[0] + root_element_closing()[2:]):
-        print(root_element_opening(), root_element_closing(), "Root element: opening and closing tag match.")
-    else:
-        print(root_element_opening(), root_element_closing(), "Root element: opening and closing tag don't match.")
-
-
-root_element_exists_and_matches()
-
-
-# ****************************************************************************************************
 #   CHECK THAT NUMBER OF < and > IS EVEN
 # ****************************************************************************************************
 
 def number_of_angle_brackets_is_even():
-    '''
+    """
     Check that number of angle brackets (<,>) is even.
     :return: sum of all angle brackets (as length of the list)
-    '''
+    """
     number_of_all_angle_brackets = len([char for char in getstring() if char == '<' or char == '>'])
     return number_of_all_angle_brackets
-
 
 print('Number of angle brackets (even?): ', number_of_angle_brackets_is_even())
 
 
 # ****************************************************************************************************
-#   GET ALL TAG NAMES
+#   GET ALL TAGS
 # ****************************************************************************************************
 
 def get_all_tags_in_order():
-    '''
+    """
     Get all tags (opening, closing) in order of appearance top down
     Procedure:
-    take tag names immediately following all '<'
-    put them into a list (which is ordered by nature)
-    do the same for the tag names after '</'
+    get positions of opening and closing brackets
+    pair up tag positions into list of tuples
+    get a list of all tags
     :return: list of tags in order (top down)
-    '''
+    """
 
     # get positions of opening and closing brackets
     opening_bracket_positions = [i for i, char in enumerate(getstring()) if char == '<']
     closing_bracket_positions = [i for i, char in enumerate(getstring()) if char == '>']
 
-    # remove any xml declaration or schema tags from lists of positions
-    temp = 0
-    for i, char in enumerate(getstring()):
-        if char == '<' and getstring()[i + 1] == '?':
-            del(opening_bracket_positions[i])
-            temp = i
-        if char == '>' and getstring()[i - 1] == '?':
-            del(closing_bracket_positions[temp])
-        '''
-        if char == '<' and getstring()[i + 1] == '!':
-            temp=i
-            del (opening_bracket_positions[i])
-            del (closing_bracket_positions[temp])
-        '''
-    # check that number of elements in both tag lists is the same. Because one of them used in for loop below.
-    assert len(opening_bracket_positions) == len(closing_bracket_positions)  # make sure they are the same length
-    result_list=[]
-    for i in range(len(opening_bracket_positions)):
-        op = opening_bracket_positions[i]
-        cl = closing_bracket_positions[i]
-        result = getstring()[op + 1:cl]
-        if result[0] == '/': result = result[1:]  # take out forward slash from the closing tag
-        result_list.append(result)
-    return result_list
+    # pair up tag positions into list of tuples
+    zipped = zip(opening_bracket_positions, closing_bracket_positions)
+    zipped = list(zipped)
+
+    # get a list of all tags
+    result = [ getstring()[i[0] : i[1]+1] for i in zipped ]
+    return result
 
 print('All tags in order: ', get_all_tags_in_order())
 
@@ -202,28 +121,167 @@ print('All tags in order: ', get_all_tags_in_order())
 # ****************************************************************************************************
 
 def each_element_has_strictly_two_identical_names_for_each_tag():
-    '''
+    """
     More of a helper function.
     Checks that all tag names, opening and closing have their corresponding pair.
     For example, there should not be three names for an element, but strictly two (opening and closing)
     :return: boolean True or False
-    '''
+    """
     l = [ get_all_tags_in_order().count(i) for i in get_all_tags_in_order() ]
     if min(l) < 2 or max(l) > 2:
         return False
     else:
         return True
 
-print('Two identical names for each element:', each_element_has_strictly_two_identical_names_for_each_tag())
+#print('Two identical names for each element:', each_element_has_strictly_two_identical_names_for_each_tag())
+
+
+# ****************************************************************************************************
+#   GET THE ROOT ELEMENT
+# ****************************************************************************************************
+
+# get the root element
+def get_root_element():
+    """
+    Get the root element:
+    Iterate through all tags (provided by get_all_tags_in_order() function )
+    Get the first tag that doesn't have ? or ! after opening bracket
+    Get the very last tag
+    :return: root element tuple
+    """
+    root_opening, root_closing='', ''
+
+    # get the first tag that doesn't have ? or ! after opening bracket
+    for i, tag in enumerate(get_all_tags_in_order()):
+        if not (tag.startswith('<?') or tag.startswith('<!')):
+            root_opening = tag
+            break
+
+    # get the very last tag
+    for i, tag in enumerate(get_all_tags_in_order()):
+        if tag.endswith('>') and i+1 == len(get_all_tags_in_order()):
+            root_closing = tag
+            break
+
+    return root_opening, root_closing
+
+print('Root element: ', get_root_element())
+
+
+# ****************************************************************************************************
+#   COMPARE OPENING AND CLOSING TAGS OF THE ROOT ELEMENT IF THEY MATCH
+# ****************************************************************************************************
+
+def root_tags_match():
+    """ Compare opening and closing root element if they match.
+    """
+    # check if the names of the root tags match
+    # make sure that for comparison you ignore the forward slash
+    opening = get_root_element()[0]
+    closing = get_root_element()[1].replace('/', '')
+    if opening == closing:
+        return True
+    else:
+        return False
+
+print('Root element tags match: ', root_tags_match())
+
+
+
+# ****************************************************************************************************
+#   DOES TAG HAVE A CORRECT ATTRIBUTE
+# ****************************************************************************************************
+
+def is_attribute_correct(tag):
+    """
+    Only checks if attribute is properly formed, not spaces before the atrribute name.
+    """
+    # POLISH - NEEDS DEFINE WELL WHAT ATTRIBUTE IS
+    attribute = False
+    if ('\"' in tag or '=' in tag): attribute = True
+    if ('\"' in tag and '=' in tag): attribute = True
+
+    # get tags where tag name goes straight into equls sign without spaces - PUT IN IT'S OWN FUNCTION?????
+    if ' ' not in tag and '=' in tag:
+        print(tag, 'Equals sign can\'t be part of xml tag name.')
+        attribute = False
+
+    return attribute
+
+
+print('Does a tag have an attribute:')
+for tag in get_all_tags_in_order():
+    print(tag, is_attribute_correct(tag))
+
+# ****************************************************************************************************
+#   CHECK THERE ARE NO SPACES IN TAG NAMES
+# ****************************************************************************************************
+
+def no_spaces_in_tag_names():   # no spaces in the first part of the term right after the <
+    """
+    # separate illegal tags with spaces from legal tags with attributes
+    # it will be attribute if it contains at least equal sign or two quotes or both
+
+    # it's an attribute if after compact term and after whitespace it has equal sign and/or quote(s)
+    # to follow style: <term attribute="">
+
+    # exclude closing tags with space
+    # function exits as soon as it hits the first tag with illegal space (doesn't do remaining tags)
+    """
+
+    # get all tags that have at least one whitespace
+    tags_spaces = [tag for tag in get_all_tags_in_order() if ' ' in tag[1:]]
+    # print(tags_spaces)
+
+    # for cases if there is "space-term-space" between name and attribute
+    for t in tags_spaces:
+        l=t.split()
+        print(l)
+
+        for i, y in enumerate(l):
+            if '=' in y:
+                if i == 1 and y.startswith('=') :
+                    print(i, t, 'Tag name goes into equals sign, becomes attribute name.')
+                    return False
+
+                # FIX THIS PART !!!!!!!!!!!!!!!!!!!!:
+                # detects <to a b="111"> as error but doesn't okay <to b ="111">
+                if i >= 2:
+                    print(i, t, 'One or more terms in between tag name and attribute name and therefore spaces.')
+                    return False
+
+
+    # some other checks for spaces
+    for tag in tags_spaces:
+        if tag[1] == '/' and ' ' in tag[1:]:
+            print('Closing tag must not have spaces.')
+            return False
+
+        elif tag[1] == ' ':
+            print('First character in a tag must not be space.')
+            return False
+
+        elif not is_attribute_correct(tag):
+            print('Tag has spaces but it doesn\'t have an attribute')
+            return False
+
+    return True
+
+print('No spaces in tag names: ', no_spaces_in_tag_names())
+
+
+# ****************************************************************************************************
+#   CHECK THERE IS NO SPACE BETWEEN OPENING BRACKET AND TAG NAME
+# ****************************************************************************************************
 
 
 
 # ****************************************************************************************************
 #   CHECK IF SEQUENCE OF OPENING ELEMENTS MATCHES THE SEQUENCE OF THE CLOSING ELEMENTS
 # ****************************************************************************************************
-
+"""
 def check_names_in_opening_and_closing_tags_match():
-    '''
+
     Compare name in opening tag to the name in corresponding closing tag
 
     ex:
@@ -277,7 +335,7 @@ def check_nesting():
     (equals)
     note, to, firstname, lastname, from, heading, body
     :return:
-    '''
+    """
 
 
 
