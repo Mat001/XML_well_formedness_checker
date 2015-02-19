@@ -1,12 +1,8 @@
 '''
 Test cases to test checker1 module.
 '''
+from xml_well_formedness_check.checker1 import *
 
-
-from xml_well_formdness_check.checker1 import *
-
-
-#file = '/home/matjaz/PycharmProjects/xml_well_formedness_check/xml_well_formdness_check/xml_example.txt'
 
 def test_get_string():
     assert getstring() != None
@@ -14,6 +10,11 @@ def test_get_string():
 
 def test_root_element_opening():
     pass
+
+
+def test_starts_with_xml_declaration():
+    assert starts_with_xml_declaration() == True
+
 
 def test_root_element_closing():
     pass
