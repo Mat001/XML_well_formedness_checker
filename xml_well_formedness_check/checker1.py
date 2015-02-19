@@ -7,10 +7,9 @@
     - FIX FEW FUNCTIONS
     - DEFINE ORDER OF WHICH FUNCTIONS NEED TO EXECUTE FIRST. SOME FUNCTIONS DEPEND ON OTHERS TO BE DONE FIRST FOR THEM TO WORK.
     (example:     )
-    - FIX NOSETEST TESTING
 
 
-    This project is a program to validate well-formdness of XML files.
+    This project is a program to validate well-formedness of XML files.
     author: Matjaz Pirnovar
 
     Rules:
@@ -48,7 +47,7 @@ D    Element names must not contain spaces (<dateofbirth> is correct, <date of b
             but falls apart because the # is not a legitimate name character.
 
 D    Must be no space between opening bracket and the name of an element.
-?    Element names must be the same in opening and closing tag.
+D    Element names must be the same in opening and closing tag.
     Elements must be closed properly: <child>Data</child>, <child attribute="value" />
 D   Tags are case sensitive.
     Attributes must have both quotation marks around attribute's value.
@@ -500,7 +499,7 @@ def no_case_sensitive_tags():
         return False
 
 
-print('No case sensitive tags: ', no_case_sensitive_tags())
+#print('No case sensitive tags: ', no_case_sensitive_tags())
 
 
 
@@ -538,6 +537,28 @@ def is_nesting_proper():
 print('Is nesting proper: ', is_nesting_proper())
 
 
+# ****************************************************************************************************
+#   CHECK THAT COMMENTS ARE PLACED ONLY WITHIN COMMENT TAGS - CHECK THAT COMMENT TAGS ARE FORMED CORRECTLY
+# ****************************************************************************************************
+def are_comment_tags_formed_correctly():
+    """
+    Check that comment tags are formed correctly.
+    Opening and closing bracket must be there, including the exclamation m nd all the dashes.
+
+    TAKE INTO ACCOUNT:
+    - what if one bracket is missing (add condition number_of_tags_must_be_even? - maybe two brackets are missing!)
+    what if one of the dashes is missing, for example <!-   -->
+    what if two, three of the dashes are missing
+    what if one or two or three extra dashes are added
+    what if exclamation mark is missing
+    :return:
+    """
+    for item in get_all_tags_in_order():
+        if item.startswith('<!--') and item.endswith('-->'):
+            pass
+
+
+print('Are comments formed correctly: ', are_comment_tags_formed_correctly())
 
 
 
