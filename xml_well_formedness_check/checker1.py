@@ -89,20 +89,7 @@ D   Tags are case sensitive.
     Referencing Schemas (XSD)
 """
 
-
-def getstring():
-    """
-    put xml content from file into a string (also make sure you use try/except!)
-    :return: xml_string
-    """
-
-    xml_string = ''
-    with open('/home/matjaz/PycharmProjects/xml_well_formedness_check/'
-              'xml_well_formedness_check/xml_example.txt', 'r') as f:
-        for i in f:
-            xml_string = xml_string + i
-        return xml_string
-
+from xml_well_formedness_check.utility_functions import *
 
 
 # ****************************************************************************************************
@@ -143,67 +130,6 @@ def number_of_angle_brackets_is_even():
 print('Number of angle brackets (even?): ', number_of_angle_brackets_is_even())
 
 
-# ****************************************************************************************************
-#   GET ALL TAGS
-# ****************************************************************************************************
-
-def get_all_tags_in_order():
-    """
-    [ ASSUMES THAT ALL ANGLE BRACKETS ARE PRESENT!!! AND THAT THERE ARE NO EXTRA ANGLE BRACKETS!
-    IF IN DOUBT THEN CHECK THAT ALL ANGLE BRACKETS ARE OKAY FIRST. ]
-    Get all tags (opening, closing) in order of appearance top down
-    Procedure:
-    get positions of opening and closing brackets
-    pair up tag positions into list of tuples
-    get a list of all tags
-    :return: list of tags in order (top down)
-    """
-
-    # get positions of opening and closing brackets
-    opening_bracket_positions = [i for i, char in enumerate(getstring()) if char == '<']
-    closing_bracket_positions = [i for i, char in enumerate(getstring()) if char == '>']
-
-    # pair up tag positions into list of tuples
-    zipped = zip(opening_bracket_positions, closing_bracket_positions)
-    zipped = list(zipped)
-
-    # get a list of all tags
-    result = [ getstring()[i[0] : i[1]+1] for i in zipped ]
-    return result
-
-print('All tags in order: ', get_all_tags_in_order())
-
-
-# ****************************************************************************************************
-#   CLEAN TAGS - CAN UTILITY FUNCTION
-# ****************************************************************************************************
-def get_clean_tags():
-    """
-    Get all tags
-    Clean the up so you get a list of element names in order as they appear in xml file top-down
-    :return: list
-    """
-    # get all tags and clean them up
-    without_declarations_and_comments = get_all_tags_in_order()
-
-    for item in get_all_tags_in_order():
-        if '<!' in item or '<?' in item:
-            without_declarations_and_comments.remove(item)
-
-    no_slash = [tag.replace('/', '') for tag in without_declarations_and_comments]
-    split = [tag.split() for tag in no_slash]
-    first_part = [part[0] for part in split]
-
-    clean = []
-    for tag in first_part:
-        tag = tag.strip('<')
-        tag = tag.strip('>')
-        clean.append(tag)
-
-    return clean
-
-print('Clean tags: ', get_clean_tags())
-
 
 # ****************************************************************************************************
 #   CHECK THAT XML FILE HAS TWO IDENTICAL NAMES FOR EACH ELEMENT (for OPENING AND CLOSING TAG)
@@ -224,37 +150,6 @@ def each_element_has_strictly_two_identical_names_for_each_tag():
 
 print('Two identical names for each element:', each_element_has_strictly_two_identical_names_for_each_tag())
 
-
-# ****************************************************************************************************
-#   GET THE ROOT ELEMENT
-# ****************************************************************************************************
-
-# get the root element
-def get_root_element():
-    """
-    Get the root element:
-    Iterate through all tags (provided by get_all_tags_in_order() function )
-    Get the first tag that doesn't have ? or ! after opening bracket
-    Get the very last tag
-    :return: root element tuple
-    """
-    root_opening, root_closing='', ''
-
-    # get the first tag that doesn't have ? or ! after opening bracket
-    for i, tag in enumerate(get_all_tags_in_order()):
-        if not (tag.startswith('<?') or tag.startswith('<!')):  # inore XML declaration and DTD declar that start with '?' and '!'
-            root_opening = tag
-            break
-
-    # get the very last tag
-    for i, tag in enumerate(get_all_tags_in_order()):
-        if tag.endswith('>') and i+1 == len(get_all_tags_in_order()):
-            root_closing = tag
-            break
-
-    return root_opening, root_closing
-
-print('Root element: ', get_root_element())
 
 
 # ****************************************************************************************************
@@ -282,7 +177,6 @@ def root_tags_match():
 
 
 print('Root element tags match: ', root_tags_match())
-
 
 
 # ****************************************************************************************************
@@ -367,7 +261,7 @@ print('No spaces in tag names: ', no_spaces_in_tag_names())
 
 
 # ****************************************************************************************************
-#   CHECK THAT THERE NO SPACE BETWEEN IN OPENING BRACKET AND NAME IN START TAGS
+#   CHECK THAT THERE IS NO SPACE BETWEEN IN OPENING BRACKET AND NAME IN START TAGS
 # ****************************************************************************************************
 def no_initial_space_in_opening_tags():
     """
@@ -382,6 +276,7 @@ def no_initial_space_in_opening_tags():
 
 
 print('No initial space in opening tags: ', no_initial_space_in_opening_tags())
+
 
 # ****************************************************************************************************
 #   CHECK THAT THERE NO SPACE IN CLOSING TAGS
@@ -502,7 +397,6 @@ def no_case_sensitive_tags():
 #print('No case sensitive tags: ', no_case_sensitive_tags())
 
 
-
 # ****************************************************************************************************
 #   CHECK THAT NESTING IS PROPER
 # ****************************************************************************************************
@@ -538,12 +432,12 @@ print('Is nesting proper: ', is_nesting_proper())
 
 
 # ****************************************************************************************************
-#   CHECK THAT COMMENTS ARE PLACED ONLY WITHIN COMMENT TAGS - CHECK THAT COMMENT TAGS ARE FORMED CORRECTLY
+#   TESTING COMMENT TAGS AND COMMENTS
 # ****************************************************************************************************
-def are_comment_tags_formed_correctly():
-    """
+
+"""
     Check that comment tags are formed correctly.
-    Opening and closing bracket must be there, including the exclamation m nd all the dashes.
+    Opening and closing bracket must be there, including the exclamation m. and all the dashes.
 
     TAKE INTO ACCOUNT:
     - what if one bracket is missing (add condition number_of_tags_must_be_even? - maybe two brackets are missing!)
@@ -551,14 +445,83 @@ def are_comment_tags_formed_correctly():
     what if two, three of the dashes are missing
     what if one or two or three extra dashes are added
     what if exclamation mark is missing
+    note that comments can encapsulate several lines with xml code in between
+    note that if item has <!-- then the first closing bracket > should have --> doesn't apply
+    because comments can have < > inside them
+
+    Follow the rule that comments can have start and close tag just about anywhere in the xml
+    as long as start and end tag complement each other and have proper syntax <!-- and -->.
+    So only check that they are a pair and that proper syntax.
+    Prevent this:
+    <!--
+    <!-- more xml -->
+    -->
+
+    # chack that all opening tags have format <!--
+    # check that all closing tags have format -->
+    # check that closing format ---> is not present
+    # check that comment element is not nested within another comment element
+
+    # check that for each opening there is a closing tag (even number of both - is that enough?)
+    # every opening tag must be immediatelly followed by a closing tag -
+    # that may prevent nesting - preceeding point!
+
+    # check that and < and > inside comments don't intefere with opening and closing comment tags
+
     :return:
     """
-    for item in get_all_tags_in_order():
-        if item.startswith('<!--') and item.endswith('-->'):
-            pass
 
 
-print('Are comments formed correctly: ', are_comment_tags_formed_correctly())
+# ****************************************************************************************************
+#   IS NUMBER OF COMMENT TAGS EVEN
+# ****************************************************************************************************
+def is_number_of_comment_tags_even():
+    """
+    Check if number of commnt tags is even
+    - utility function
+    :return:
+    """
+    if len(get_opening_comment_tag_positions() + get_closing_comment_tag_positions()) % 2 == 0:
+        return True
+    else:
+        return False
+
+print('Is number of comment tags even: ',  is_number_of_comment_tags_even())
+
+
+# ****************************************************************************************************
+#   CHECK THAT OPENING COMMENT TAG IS FOLLOWED BY CLOSING TAG
+# ****************************************************************************************************
+def is_comment_opening_tag_followed_by_closing():
+    """
+    # TEST THAT EACH OPENING TAG IS FOLLOWED BY CLOSING TAG
+    Sequence of comment tags must follow: opening-closing_opening_closing.
+    Disallow two of the same one after the other. This will check for nesting.
+    :return: boolean
+    """
+    if is_number_of_comment_tags_even():
+        l=[]
+        # append position of oneing tag then closing, then opening, then closing etc.
+        # sequence must be strictly sorted in ascending order, otherwise this function test fails-False
+        for i in range(len(get_opening_comment_tag_positions())):
+            l.append(get_opening_comment_tag_positions()[i])
+            l.append(get_closing_comment_tag_positions()[i])
+        print('SEQUENCE: ', l)
+        if l == sorted(l):
+            return True
+        else:
+            return False
+    else:
+        print('Number of comment tags is not even - wrong nesting.')
+        return False
+
+print('Is opening tag for comments immediatelly followed by closing (means there is no nesting): ', is_comment_opening_tag_followed_by_closing())
+
+
+
+
+
+
 
 
 

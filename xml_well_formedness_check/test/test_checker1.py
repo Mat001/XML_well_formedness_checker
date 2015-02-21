@@ -1,6 +1,8 @@
 '''
 Test cases to test checker1 module.
 '''
+
+
 from xml_well_formedness_check.checker1 import *
 
 
@@ -31,6 +33,7 @@ def test_get_all_tags_in_order():
 def test_each_element_has_strictly_two_identical_names_for_each_tag():
     #assert each_element_has_strictly_two_identical_names_for_each_tag()
     pass
+
 
 
 
