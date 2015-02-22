@@ -48,7 +48,6 @@ def get_all_tags_in_order():
     result = [ getstring()[i[0] : i[1]+1] for i in zipped ]
     return result
 
-print('All tags in order: ', get_all_tags_in_order())
 
 
 # ****************************************************************************************************
@@ -97,7 +96,6 @@ def get_clean_tags():
 
     return clean
 
-print('Clean tags: ', get_clean_tags())
 
 
 # ****************************************************************************************************
@@ -127,7 +125,6 @@ def get_root_element():
 
     return root_opening, root_closing
 
-print('Root element: ', get_root_element())
 
 
 # ****************************************************************************************************
@@ -153,3 +150,21 @@ def get_closing_comment_tag_positions():
     comm_closing = [j for j in range(len(getstring())) if getstring().startswith('-->', j)]
     #print('CLOSING: ', comm_closing)
     return comm_closing
+
+
+# ****************************************************************************************************
+#   GET SINGLE ELEMENTS - utility function
+# ****************************************************************************************************
+def get_single_elements():
+    """
+    Get single elements (eg <example/> <br       />, <acb />, <child attribute="value" />)
+    :return: list of single elements in order of appearance in xml file (top down)
+    """
+    position = []
+    for i in get_clean_tags():
+        if get_clean_tags().count(i) == 1:  # if number of occurrences of a tag is one, then it's a single tag
+            position.append(get_clean_tags().index(i))  # store position of the single element
+
+    # retrieve the full tags by using its position
+    single_tags = [get_all_tags_in_order()[i] for i in position]
+    return single_tags
