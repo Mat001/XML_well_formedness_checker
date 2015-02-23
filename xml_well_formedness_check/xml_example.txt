@@ -5,14 +5,14 @@
     <aaa/>
     <!-- this a test xml file -->
         <firstname b="12">Tove</firstname>
-        <lastname a= " sds">Brown</lastname>
+        <lastname a= " sds">Brown John</lastname>
     <from >
     <br />
     <!-- -->
     Jani</from>
     </to>
-    <!-- this a test xml file -->
+    <!-- this a test xml file--->
     <br#$% />
     <heading>Reminder</heading>
-    <body id=>Don't forget me this weekend!</body
+    <body id=>Dont forget me this weekend!</body>
 </note>

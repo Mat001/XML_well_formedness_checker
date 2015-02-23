@@ -3,10 +3,10 @@
     (htmldom is a nice xml/html parsing python code: source code is interesting-it's in downloads folder)
 
     TO DO:
-    - SEPARATE UTILITY FUNCTIONS INTO SEPARATE MODULE (for example get_clean_tags())
+D    - SEPARATE UTILITY FUNCTIONS INTO SEPARATE MODULE (for example get_clean_tags())
     - FIX FEW FUNCTIONS
     - DEFINE ORDER OF WHICH FUNCTIONS NEED TO EXECUTE FIRST. SOME FUNCTIONS DEPEND ON OTHERS TO BE DONE FIRST FOR THEM TO WORK.
-    (example:     )
+    IMPORTANT!
 
 
     This project is a program to validate well-formedness of XML files.
@@ -22,13 +22,12 @@ D    Elements can have opening and closing tag AND can be single!
         <tag></tag>, <dd/>, <acb />, <child attribute="value" />
         (IMPORTANT - NOTE THIS LAST THREE SINGLE EMPTY TAGS - DON'T HAVE THEIR PAIRS!)
 D    Single elements are empty and have forward slash before closing bracket.
-    Single elements can contain attributes.
 
+D?    Element names must not contain spaces (<dateofbirth> is correct, <date of birth> is incorrect ).
 D    Element names must not start with digits, diacritics, the full stop, the hyphen(minus) and 'xml' (any letter case).
 D    Element names must start with letter (uppercase or lowercase), underscore, or colon.
 D    Element names can contain colon, hyphen-minus, full stop (period), low line (underscore), and middle dot.
-D?    Element names must not contain spaces (<dateofbirth> is correct, <date of birth> is incorrect ).
-        Permitted:
+        Permitted: - W3schools xml validator doesn't allow to start with : or _  -strange!
             axiom
             _axiom_26
             :axiom_veintiséis
@@ -50,26 +49,60 @@ D    Must be no space between opening bracket and the name of an element.
 D    Element names must be the same in opening and closing tag.
 D    Elements must be closed properly: <child>Data</child>, <child attribute="value" />
 D?   Tags are case sensitive.
-    Attributes must have both quotation marks around attribute's value.
 D    Comments must be within comment tags <!-- -->.
 D    Comments are not allowed to end with --->.
 D    Matjaz: Comments (comment tags) must not be nested inside other comments.
-    An attribute name must not appear more than once in the same start tag.
 D    Closing tags don't have attributes.
-    Attribute values must not contain entity references to external entities.
-    '<' character is not allowed in attribute values. ('>' is allowed????)
-    All data content must be within element tags (not inside tags).
-    XML must allow multiple whitespace characters.
+
+
+
+    Must allow multiple whitespace characters - define where!
     There may be whitespace between the end of the name or attribute in an opening element tag and the closing
     bracket of that element.
         Example: <body   > is allowed
-    Characters to escape in XML - should not appear in xml document content- do flag error, except if replaced
-    by char. entity reference:
+    All data content must be within element tags (not inside tags). (how to chcek that???)
+
+    Attributes must have both quotation marks around attribute's value.
+    An attribute name must not appear more than once in the same start tag.
+    Attribute values must not contain entity references to external entities.
+    Single elements can contain attributes.
+    '<' character is not allowed in attribute values. ('>' is allowed????)
+
+    ----------------------------------
+D?  SPECIAL CHARACTERS to escape in XML - should not appear in xml document content- must be escape with the following terms:
+    CHECK IS THIS FOR NAMES OR DATA CONTENT?????
         "   &quot;
         '   &apos;
         <   &lt;
         >   &gt;
         &   &amp;
+
+    (from w3.org) - for DATA CONTENT:
+    The ampersand character (&) and the left angle bracket (<) MUST NOT appear in their literal form,
+    except when used as markup delimiters, or within a comment, a processing instruction, or a CDATA section.
+    If they are needed elsewhere, they MUST be escaped using either numeric character references or
+    the strings " &amp; " and " &lt; " respectively. The right angle bracket (>) may be represented
+    using the string " &gt; ", and MUST, for compatibility, be escaped using either " &gt; " or
+    a character reference when it appears in the string " ]]> " in content, when that string
+    is not marking the end of a CDATA section.
+
+    ALSO SEE https://stackoverflow.com/questions/730133/invalid-characters-in-xml:
+    The < MUST be escaped with a &lt; entity, since it is assumed to be the beginning of a tag.
+    The & MUST be escaped with a &amp; entity, since it is assumed to be the beginning a entity reference
+    The > should be escaped with &gt; entity. It is not mandatory -- it depends on the context -- but it is strongly advised to escape it.
+    The ' should be escaped with a &apos; entity -- mandatory in attributes defined within single quotes but it is strongly advised to always escape it.
+    The " should be escaped with a &quot; entity -- mandatory in attributes defined within double quotes but it is strongly advised to always escape it.
+    ---------------------------------
+
+    Data content must be within root element. Must not be outside of root element.
+D    Data content must be in between any two > and < brackets.
+        (Data content can be nested. It can appear like this:
+            <tagA>
+            aaa
+                <tagB>bbb</tagB>
+            </tagA>)
+
+    MISC (for later):
     Doctype (DTD) declaration: <!DOCTYPE greeting SYSTEM "hello.dtd">
         Recommended doctype declarations: http://www.w3.org/QA/2002/04/valid-dtd-list.html
         Example why DTD is important:
@@ -282,7 +315,6 @@ def no_initial_space_in_opening_tags():
     Check there is no space between opening bracket and the name in opening tags
     :return: boolean
     """
-
     for tag in get_all_tags_in_order():
         if tag[1] == ' ':
             #print('Space immediatelly after \'<\' not allowed.', tag)
@@ -313,8 +345,6 @@ def no_spaces_in_closing_tags():
 # ****************************************************************************************************
 def no_invalid_initial_characters_in_opening_tag():
     """
-    DOESN'T DO ANYTHING ABOUT &, ^, %, $, # etc. CHECK WHAT TO DO HERE? Specification allows them?
-
     Element names must not start with digits, diacritics, the full stop, the hyphen and 'xml' (any letter case).
     Element names must start with letter (uppercase or lowercase), underscore, or colon.
     :return: boolean
@@ -343,7 +373,7 @@ def no_invalid_initial_characters_in_opening_tag():
                 return True
             else:
                 print(tag)
-                print('Some other character that needs to be evaluated.')
+                return False
 
 
 # ****************************************************************************************************
@@ -607,11 +637,10 @@ def comment_closing_tags_dont_have_extra_dash():
     Check that comment closing tags don't have extra dash (--->).
     :return: boolean
     """
-    clos = [j for j in range(len(getstring())) if getstring().startswith('--->', j)]
-    if len(clos) == 0:
-        return True
-    else:
+    if '--->' in getstring():
         return False
+    else:
+        return True
 
 
 # ****************************************************************************************************
@@ -670,6 +699,37 @@ def single_element_is_correctly_formed_with_attribute():
         return False
 
 
+# ****************************************************************************************************
+#   CHECK THAT NO RESTRICTED CHARACTERS ARE PRESENT IN DATA CONTENT
+# ****************************************************************************************************
+def no_restricted_characters_in_content():
+    """
+    WARNING: DOESN'T YET HANDLE REPLACEMENTS WITH &quot; &apos; etc.
+
+    Characters ", ', <, >, & must not appear in xml document content.
+    They need to be replaced by:
+        "   &quot;
+        '   &apos;
+        <   &lt;
+        >   &gt;
+        &   &amp;
+    :return: boolean
+    """
+    # get content between tags (>  <)
+    # check that it doesn't contain any of the above characters
+    restricted = [ '\"', '\'', '<', '>', '&'  ]
+    restricted_chars = [ char for char in get_data_content() for c in restricted if c in char ]
+    if len(restricted_chars) != 0:
+        # print(restricted_chars)
+        return False
+    else:
+        return True
+
+
+
+
+
+
 
 
 # ****************************************************************************************************
@@ -712,9 +772,9 @@ print('Is opening tag for comments immediatelly followed by closing tag (means t
 print('Comment closing tags dont have extra dash: ', comment_closing_tags_dont_have_extra_dash())
 
 print('Get single elements: ', get_single_elements())
-print('Single element is correctly formed (not considering attrib.: ', single_element_is_correctly_formed_without_attribute())
+print('Single element is correctly formed (not considering attrib.): ', single_element_is_correctly_formed_without_attribute())
 
-
+print('No restricted characters in content: ', no_restricted_characters_in_content())
 
 
 

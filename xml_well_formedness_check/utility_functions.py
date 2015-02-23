@@ -166,5 +166,50 @@ def get_single_elements():
             position.append(get_clean_tags().index(i))  # store position of the single element
 
     # retrieve the full tags by using its position
-    single_tags = [get_all_tags_in_order()[i] for i in position]
+    single_tags = [get_all_tags_in_order()[i] for i in position]    # BUGGG !!!!! DOn't USE all tags in order. remove dcar, doctyp and comments !!!
     return single_tags
+
+
+def get_data_content():
+    """
+
+    TRICKY: < and > in content THROW OFF get_clean_tags() FUNCTION INDEX OUT OF RANGE.
+    MAYBE DO FUNCTIONS THAT CHECK FOR EVEN NUMBER OF TAGS ETC FIRST.
+
+    Get data content of each element.
+    SImilar to workings of get_all_tags_in_order function.
+    :return: list of strings for content in between element tags
+    """
+    # get positions of opening and closing brackets BUT EXCLUDE ALL TAGS PRIOR TO ROOT ELEMENT.
+    # Only take what's inside the root element.
+
+    # assumes the first char is opening bracket and skips to count from the second one on
+    # because we need to count like this: ((first closing br, second opening br), (second closing, third opening) etc)
+    opening_bracket_positions = [i for i, char in enumerate(getstring()[1:]) if char == '<'
+                                    and not char.startswith('<?') and not char.startswith('<!') ]
+    closing_bracket_positions = [i for i, char in enumerate(getstring()) if char == '>'
+                                    and not char.startswith('<?') and not char.startswith('<!')]
+
+    # pair up closing and opening tag positions into list of tuples
+    zipped = zip(closing_bracket_positions, opening_bracket_positions)
+    zipped = list(zipped)
+
+    # get content in between closing and opening tag (excluding brackets signs)
+    content = [getstring()[ i[0]+1 : i[1]+1 ] for i in zipped]
+    return content
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
