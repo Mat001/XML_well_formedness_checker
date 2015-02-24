@@ -3,8 +3,17 @@
     (htmldom is a nice xml/html parsing python code: source code is interesting-it's in downloads folder)
 
     TO DO:
-D    - SEPARATE UTILITY FUNCTIONS INTO SEPARATE MODULE (for example get_clean_tags())
-    - FIX FEW FUNCTIONS
+    FIX functions:
+    - case sensitivity
+    - get single elements
+    - problematic single element
+    - element_pair_has_strictly_identical_names() - badly designed function
+    - check function paired_elements_are_closed_properly() - it should be okay, but check comments
+    - check all single elements functions
+    - check comments in all functions 9including utilities) for bugs, problems
+    - see what else is needed from the list (ignore attribs for now)
+    - clean up docstrings
+    - test
     - DEFINE ORDER OF WHICH FUNCTIONS NEED TO EXECUTE FIRST. SOME FUNCTIONS DEPEND ON OTHERS TO BE DONE FIRST FOR THEM TO WORK.
     IMPORTANT!
 
@@ -170,15 +179,18 @@ def starts_with_xml_declaration():
     # if anything before '<?xml' check that that is a comment
     xml='<?xml'
 
-    if not getstring().startswith(xml):
+    # Starts with xml declaration
+    if getstring().startswith(xml):
         #print('XML file immediately starts with XML declaration.')
-        return False
-    elif getstring()[:getstring().index(xml)].startswith('<!--')\
+        return True
+
+    # starts with a comment and then xml declaration - that's okay
+    if getstring()[:getstring().index(xml)].startswith('<!--')\
         and getstring()[:getstring().index(xml)].strip().endswith('-->'):
         #print("XML file starts with a comment(s) and then with XML declaration.")
         return True
     else:
-        #print('XML file does not start with XML declaration.')
+        print('XML file does not start with XML declaration.')
         return False
 
 
@@ -187,7 +199,7 @@ def starts_with_xml_declaration():
 #   CHECK THAT XML FILE HAS TWO IDENTICAL NAMES FOR EACH ELEMENT (for OPENING AND CLOSING TAG)
 # ****************************************************************************************************
 
-def element_pair_has_strictly_identical_names():
+def element_pair_has_strictly_identical_names():    # BAD FUNCTION, DOESN'T DIRECTLY TEST NAMES - DO THAT, CHANGE IT
     """
     More of a helper function. - DOESNT DEAL WITH SINGLE-ELEMENT TAGS - IF ANY CORRECT SINGLE ELEMENT TAGS ARE PRESENT RETURNS FALSE.
     SHOULD THAT BE OKAY, OR REDESIGN?
@@ -195,16 +207,20 @@ def element_pair_has_strictly_identical_names():
     For example, there should not be three names for an element, but strictly two (opening and closing)
     :return: boolean True or False
     """
+    ### should really use this comprehension for removing single elements
+    ### tag_list_pairs = [x for x in get_clean_tags() if get_clean_tags().count(x) >= 2]
+
     # get occurences of each element
     occurences_each = [ get_clean_tags().count(i) for i in get_clean_tags() ]
-    print(occurences_each)
+    # print(occurences_each)
     # exclude single elements
     [ occurences_each.remove(i) for i in occurences_each if i != 2 ]
     occurences_pairs = occurences_each
-    if min(occurences_pairs) > 1 and max(occurences_pairs) < 3:
-        return True
-    else:
+
+    if not (min(occurences_pairs) > 1 and max(occurences_pairs) < 3):
         return False
+    else:
+        return True
 
 
 
@@ -220,18 +236,28 @@ def root_tags_match():
     # clean opening and closing tag
     # inthis case it means: transform tuple ("<example id=''>", '</example>') into <example, <example)
     opening = get_root_element()[0] # get opening tag
-    opening = opening.split()[0]    # ignore any attributes and closing bracket
 
-    closing = get_root_element()[1].replace('/', '')    # get closing tag and ignore forward slash
-    closing = closing.split('>')[0] # ignore closing bracket
+    # get tag name from < to first whitespace and
+    # get tag name from < to >
+    first_space = opening.find(' ')
+    no_space = opening.find('>')
+    opening_if_space = opening[1:first_space]
+    opening_if_no_space = opening[1:no_space]
 
-    # now tags should be in clean form to be compared (eg <example, <example)
-    if opening == closing:
-        return True
-    else:
+    if ' ' in opening: opening = opening_if_space
+    elif ' ' not in opening: opening = opening_if_no_space
+
+    closing = get_root_element()[1].replace('/', '')    # ignore forward slash in closing tag
+    closing = closing[1:-1]     # get closing tag's name
+
+    # now tags should be in clean form to be compared (eg example, example)
+    if opening != closing:
         return False
+    else:
+        return True
 
 
+''' Not needed at the moment
 # ****************************************************************************************************
 #   DOES TAG HAVE A CORRECT ATTRIBUTE - CHECK, NEEDS FIXING?
 # ****************************************************************************************************
@@ -253,9 +279,9 @@ def is_attribute_correctly_formed(tag):     # chnge this, to not having to enter
         attribute = False
 
     return attribute
+'''
 
-
-
+''' not needed at the moment
 # ****************************************************************************************************
 #   CHECK THERE ARE NO SPACES IN TAG NAMES - NEEDS FIXING!!
 #     MAYBE WRITE FROM SCRATCH, FUNCTION FOR INITIAL SPACE AND SPACES IN TAG NAMES ARE ALREADY DOING SIMILAR CHECK
@@ -304,7 +330,7 @@ def no_spaces_in_tag_names():   # no spaces in the first part of the term right 
             return False
 
     return True
-
+'''
 
 
 # ****************************************************************************************************
@@ -317,7 +343,7 @@ def no_initial_space_in_opening_tags():
     """
     for tag in get_all_tags_in_order():
         if tag[1] == ' ':
-            #print('Space immediatelly after \'<\' not allowed.', tag)
+            print('Space immediatelly after \'<\' not allowed.', tag)
             return False
         else:
             return True
@@ -372,7 +398,7 @@ def no_invalid_initial_characters_in_opening_tag():
             elif tag[1] == ':':
                 return True
             else:
-                print(tag)
+                print('Element name should start with letter, unsderscore or colon: ',  tag)
                 return False
 
 
@@ -388,17 +414,17 @@ def element_names_contain_only_valid_characters():
     (source: http://www.xml.com/pub/a/2001/07/25/namingparts.html and http://www.w3.org/TR/xml/#sec-well-formed)
 
     - Doesnt check initial character rules (already covered)
-    - Doesn't check for spaces in names (already covered)
-    :return:
+    - Doesn't check for initial space in name (already covered)
+    :return: boolean
     """
 
     if no_invalid_initial_characters_in_opening_tag() and no_initial_space_in_opening_tags():
         names = set(get_clean_tags())
 
         # if anything else but letters, digits, hyphens, underscores, colons or full stops in names return false
-        for char in names:
-            if not re.match(r'[ A-Za-z0-9_:.-]*$', char):
-                print('Failed char: ', char)
+        for name in names:
+            if not re.match(r'[ A-Za-z0-9_:.-]*$', name):
+                print('Element name contains invalid character(s): ', name)
                 return False
         return True
 
@@ -410,7 +436,7 @@ def element_names_contain_only_valid_characters():
 # ****************************************************************************************************
 #   CHECK THAT ELEMENTS ARE CLOSED PROPERLY (PAIRED ELEMENTS, NOT SINGLE ONES)
 # ****************************************************************************************************
-def elements_are_closed_properly():
+def paired_elements_are_closed_properly():
     """
     Check that paired elements (not single ones) are closed properly.
     Based on the fact that number of < must match number of </.
@@ -424,12 +450,13 @@ def elements_are_closed_properly():
         return False
 
     if not number_of_opening_and_closing_brackets_match():
+        print('Numbers of opening and closing brackets don\'t match.')
         return False
 
     else:
         # THIS IS SAME TEST FOR NUMBER OF OPENING AND CLOSING BRACKETS as in number_of_opening_and_closing_brackets_match() ?
         # WITH A DIFFERENCE THAT IT CHECKS FOR / IN CLOSING TAG!
-        # REDSIGN AND US ONLY number_of_opening_and_closing_brackets_match() IF THE SAME RESULT!!!!!
+        # REDSIGN AND USE ONLY number_of_opening_and_closing_brackets_match() IF THE SAME RESULT!!!!!
 
         # get number of opening brackets
         opening = 0
@@ -438,16 +465,16 @@ def elements_are_closed_properly():
                 opening += 1
 
         # get number of closing brackets
-        ending = getstring().count('</')
+        closing = getstring().count('</')
 
         print('opening: ', opening)
-        print('ending: ', ending)
+        print('ending: ', closing)
 
-        if opening == ending:
-            return True
-        else:
+        if opening != closing:
             print('Closing tags not formatted properly.')
             return False
+        else:
+            return True
 
 
 
@@ -500,17 +527,17 @@ def no_case_sensitive_tags():
     not_matching_text = [ (clean[i[0]], clean[i[1]]) for i in not_matching ]
 
     # return True of numberof mismatches in zero, False otherwise
-    if not_matching == 0:
-        print('All tag pairs have the same letter case. No mismatches.')
-        return True
-    else:
+    if not_matching != 0:
         print('Upper/lower case mismatch in ' + str(len(not_matching)) + ' elements: ' + str(not_matching_text))
         return False
+    else:
+        print('All tag pairs have the same letter case. No mismatches.')
+        return True
 
 
 
 # ****************************************************************************************************
-#   CHECK THAT NESTING IS PROPER
+#   CHECK THAT NESTING IS PROPER - DONE!
 # ****************************************************************************************************
 def is_nesting_proper():
     """
@@ -527,11 +554,12 @@ def is_nesting_proper():
     For example <to><from><lastname></lastname></to></from> is incorrect
     :return: boolean
     """
-    tag_list = get_clean_tags()
-    print('clean: ', tag_list)
-    temp_list = []
+    # remove single elements (they don't affect nesting)
+    tag_list_pairs = [x for x in get_clean_tags() if get_clean_tags().count(x) >= 2]
 
-    for item in tag_list:
+    # use symmetry approach using a stack
+    temp_list = []
+    for item in tag_list_pairs:
         if item not in temp_list:
             temp_list.append(item)
         elif item == temp_list[-1]:
@@ -613,16 +641,16 @@ def is_comment_opening_tag_followed_by_closing_tag():
     """
     if is_number_of_comment_tags_even():
         l=[]
-        # append position of oneing tag then closing, then opening, then closing etc.
+        # append position of opeing tag then closing, then opening, then closing etc.
         # sequence must be strictly sorted in ascending order, otherwise this function test fails-False
         for i in range(len(get_opening_comment_tag_positions())):
             l.append(get_opening_comment_tag_positions()[i])
             l.append(get_closing_comment_tag_positions()[i])
         #print('SEQUENCE: ', l)
-        if l == sorted(l):
-            return True
-        else:
+        if l != sorted(l):
             return False
+        else:
+            return True
     else:
         print('Number of comment tags is not even - wrong nesting.')
         return False
@@ -644,7 +672,7 @@ def comment_closing_tags_dont_have_extra_dash():
 
 
 # ****************************************************************************************************
-#   CHECK THAT COMMENTS THAT ARE NOT SINGLE DON'T HAVE ATTRIBUTES
+#   CHECK THAT CLOSING TAGS THAT ARE NOT SINGLE DON'T HAVE ATTRIBUTES
 # ****************************************************************************************************
 def closing_tags_that_are_not_single_dont_have_attributes():
     """
@@ -662,12 +690,13 @@ def closing_tags_that_are_not_single_dont_have_attributes():
 
 
 # ****************************************************************************************************
-#   CHECK THAT SINGLE ELEMENTS ARE CORRECTLY FORMED - WITHOUT ATRIBUTE
+#   CHECK THAT SINGLE ELEMENTS ARE CORRECTLY FORMED - CASE WITHOUT ATTRIBUTE
 # ****************************************************************************************************
-def single_element_is_correctly_formed_without_attribute():
+def single_element_is_correctly_formed_case_without_attribute():
     """
     Check that single elements are correctly formed.
     Examples: <example/> <br       />, <acb />, <child attribute="value" />
+    - ADDITIONAL: allow spaces after element name
 
     # Done so far:
     # Includes proper closure!
@@ -687,7 +716,7 @@ def single_element_is_correctly_formed_without_attribute():
             print('Problematic single element - not correctly formed: ', tag)
             return False
 
-
+''' Not needed at the moment - maybe allow space after the single element tag name
 # ****************************************************************************************************
 #   CHECK THAT SINGLE ELEMENTS ARE CORRECTLY FORMED - WITH ATRIBUTE
 # ****************************************************************************************************
@@ -697,13 +726,14 @@ def single_element_is_correctly_formed_with_attribute():
     else:
         print('Single element is not correctly formed (not to do with attribute).')
         return False
-
+'''
 
 # ****************************************************************************************************
 #   CHECK THAT NO RESTRICTED CHARACTERS ARE PRESENT IN DATA CONTENT
 # ****************************************************************************************************
 def no_restricted_characters_in_content():
     """
+    TO SIMPLIFY, LIMIT RESTRICTED CHARS TO: <,>,&
     WARNING: DOESN'T YET HANDLE REPLACEMENTS WITH &quot; &apos; etc.
 
     Characters ", ', <, >, & must not appear in xml document content.
@@ -715,17 +745,15 @@ def no_restricted_characters_in_content():
         &   &amp;
     :return: boolean
     """
-    # get content between tags (>  <)
+    # get content between tags (>  <)g
     # check that it doesn't contain any of the above characters
-    restricted = [ '\"', '\'', '<', '>', '&'  ]
+    restricted = [ '<', '>', '&' ]
     restricted_chars = [ char for char in get_data_content() for c in restricted if c in char ]
     if len(restricted_chars) != 0:
-        # print(restricted_chars)
+        print('Invalid characters (<, >, &) in data content: ', restricted_chars)
         return False
     else:
         return True
-
-
 
 
 
@@ -738,6 +766,10 @@ def no_restricted_characters_in_content():
 #   EXECUTE FUNCTIONS
 # ****************************************************************************************************
 
+print('**********************************************************************************')
+print('    UTILITIES')
+print('**********************************************************************************')
+
 # UTILITIES
 print('All tags in order: ', get_all_tags_in_order())
 print('Clean tags: ', get_clean_tags())
@@ -745,19 +777,22 @@ print('Root element: ', get_root_element())
 print('Get comment opening tag positions: ', get_opening_comment_tag_positions())
 print('Get comment closing tag positions: ', get_closing_comment_tag_positions())
 
+print('**********************************************************************************')
+print('    CHECKS')
+print('**********************************************************************************')
 
 # CHECKS
 print('Number of angle brackets is even: ', number_of_angle_brackets_is_even())
 print('Numbers of opening and closing brackets match: ', number_of_opening_and_closing_brackets_match())
-print('Starts with xml declaration: ', starts_with_xml_declaration())
+print('Starts with xml declaration (or comment and then xml declar.)): ', starts_with_xml_declaration())
 print('Two identical names for each element (excluding single elms):', element_pair_has_strictly_identical_names())
 print('Root element tags match: ', root_tags_match())
-print('No spaces in tag names: ', no_spaces_in_tag_names())
+# print('No spaces in tag names: ', no_spaces_in_tag_names())
 print('No invalid initial characters in opening tag: ', no_invalid_initial_characters_in_opening_tag())
 print('No initial space in opening tags: ', no_initial_space_in_opening_tags())
 print('Element names contain only valid characters: ', element_names_contain_only_valid_characters())
 print('No spaces in closing tags:', no_spaces_in_closing_tags())
-print('Elements are closed properly: ', elements_are_closed_properly())
+print('Elements are closed properly: ', paired_elements_are_closed_properly())
 print('Closing tags (not single) dont have attributes: ', closing_tags_that_are_not_single_dont_have_attributes())
 #print('No case sensitive tags: ', no_case_sensitive_tags())
 print('Does a tag have a correctly formed attribute:')
@@ -772,7 +807,7 @@ print('Is opening tag for comments immediatelly followed by closing tag (means t
 print('Comment closing tags dont have extra dash: ', comment_closing_tags_dont_have_extra_dash())
 
 print('Get single elements: ', get_single_elements())
-print('Single element is correctly formed (not considering attrib.): ', single_element_is_correctly_formed_without_attribute())
+print('Single element is correctly formed (not considering attrib.): ', single_element_is_correctly_formed_case_without_attribute())
 
 print('No restricted characters in content: ', no_restricted_characters_in_content())
 

@@ -14,5 +14,6 @@
     <!-- this a test xml file--->
     <br#$% />
     <heading>Reminder</heading>
-    <body id=>Dont forget me this weekend!</body>
+    <body id=>Dont forget me this weekend!
 </note>
+</body>

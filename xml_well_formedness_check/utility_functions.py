@@ -14,7 +14,7 @@ def getstring():
 
     xml_string = ''
     with open('/home/matjaz/PycharmProjects/xml_well_formedness_check/'
-              'xml_well_formedness_check/xml_example.txt', 'r') as f:
+              'xml_well_formedness_check/xml_example2.txt', 'r') as f:
         for i in f:
             xml_string = xml_string + i
         return xml_string
@@ -47,7 +47,6 @@ def get_all_tags_in_order():
     # get a list of all tags
     result = [ getstring()[i[0] : i[1]+1] for i in zipped ]
     return result
-
 
 
 # ****************************************************************************************************
@@ -97,7 +96,6 @@ def get_clean_tags():
     return clean
 
 
-
 # ****************************************************************************************************
 #   GET THE ROOT ELEMENT - utility function
 # ****************************************************************************************************
@@ -124,7 +122,6 @@ def get_root_element():
             break
 
     return root_opening, root_closing
-
 
 
 # ****************************************************************************************************
