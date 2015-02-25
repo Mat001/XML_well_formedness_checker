@@ -1,11 +1,15 @@
 TO DO:
     FIX functions:
-    - check function paired_elements_are_closed_properly_and_names_match() - line print('l_no_attributes: ', l) gives 7 <body> elements !!!
-        also for ex. </hello> element in xml is not picked up by th program!
+    - <aaa/> is incorrectly pickd up by single_element_is_correctly_formed() function
     - check comments in all functions (including utilities) for bugs, problems
     - see what else is needed from the list (ignore attribs for now)
     - clean up docstrings
     - test
+
+    FOR LATER:
+    - DOES TAG HAVE A CORRECT ATTRIBUTE
+    - CHECK THAT SINGLE ELEMENTS ARE CORRECTLY FORMED - WITH ATRIBUTE
+    - CHECK THAT THERE IS NOTHING (no text) BEFORE OPENING ROOT TAG (except declarations, doctype, comments)
 
 
 # ****************************************************************************************************

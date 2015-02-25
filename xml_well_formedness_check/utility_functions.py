@@ -1,7 +1,10 @@
 """
-Utility functions for xml checker.
+Utility functions for xml well formedness checker.
 They provide helpful functionality but don't perform direct checking of the xml file.
 """
+
+import logging
+import sys
 
 # ****************************************************************************************************
 #   GET XML STRING -READ FROM FILE - utility function
@@ -11,13 +14,19 @@ def getstring():
     put xml content from file into a string (also make sure you use try/except!)
     :return: xml_string
     """
+    logging.basicConfig(level=logging.DEBUG)
 
     xml_string = ''
-    with open('/home/matjaz/PycharmProjects/xml_well_formedness_check/'
-              'xml_well_formedness_check/xml_example.txt', 'r') as f:
-        for i in f:
-            xml_string = xml_string + i
+
+    try:
+        with open('/home/matjaz/PycharmProjects/xml_well_formedness_check/'
+                  'xml_well_formedness_check/xml_example.txt', 'r') as f:
+            for i in f:
+                xml_string = xml_string + i
         return xml_string
+    except IOError as e:
+        logging.error(e)
+        logging.error(sys.exc_info())
 
 
 # ****************************************************************************************************
@@ -47,6 +56,28 @@ def get_all_tags_in_order():
     # get a list of all tags
     result = [ getstring()[i[0] : i[1]+1] for i in zipped ]
     return result
+
+
+# ****************************************************************************************************
+#   REMOVE DECLARATIONS, DOCTYPE AND COMMENTS - utility function
+# ****************************************************************************************************
+def remove_declaration_doctype_comments():
+    """
+    Removes xml declartion, doctype and comment tags for easier processing of remaining elements.
+    :return: list of elements
+    """
+    # clean up tags from scratch and remove single elements (they don't affect nesting)
+    without_declarations_and_comments = get_all_tags_in_order()
+
+    for item in get_all_tags_in_order():
+        if '<!' in item:
+            without_declarations_and_comments.remove(item)
+            # print(without_declarations_and_comments)
+        if '<?' in item:
+            without_declarations_and_comments.remove(item)
+            # print(without_declarations_and_comments)
+
+    return without_declarations_and_comments
 
 
 # ****************************************************************************************************
@@ -242,24 +273,7 @@ def find_duplicate_tags():
     return duplicates
 
 
-# ****************************************************************************************************
-#   REMOVE DECLARATIONS, DOCTYPE AND COMMENTS - utility function
-# ****************************************************************************************************
-def remove_declaration_doctype_comments():
-    """
-    Removes xml declartion, doctype and comment tags for easier processing of remaining elements.
-    :return: list of elements
-    """
-    # clean up tags from scratch and remove single elements (they don't affect nesting)
-    without_declarations_and_comments = get_all_tags_in_order()
 
-    for item in get_all_tags_in_order():
-        if '<!' in item:
-            without_declarations_and_comments.remove(item)
-            # print(without_declarations_and_comments)
-        if '<?' in item:
-            without_declarations_and_comments.remove(item)
-            # print(without_declarations_and_comments)
 
-    return without_declarations_and_comments
+
 
