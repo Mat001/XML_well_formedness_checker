@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# xml_well_formdness_check documentation build configuration file, created by
+# xml_well_formedness_check documentation build configuration file, created by
 # sphinx-quickstart on Fri Feb 13 22:49:31 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -19,7 +19,7 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('/home/matjaz/PycharmProjects/xml_well_formedness_check/xml_well_formdness_check'))
+sys.path.insert(0, os.path.abspath('/home/matjaz/PycharmProjects/xml_well_formedness_check/xml_well_formedness_check'))
 
 # -- General configuration ------------------------------------------------
 
@@ -48,7 +48,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'xml_well_formdness_check'
+project = 'xml_well_formedness_check'
 copyright = '2015, Matjaz Pirnovar'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -201,7 +201,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'xml_well_formdness_check.tex', 'xml\\_well\\_formdness\\_check Documentation',
+  ('index', 'xml_well_formedness_check.tex', 'xml\\_well\\_formdness\\_check Documentation',
    'Matjaz Pirnovar', 'manual'),
 ]
 
@@ -231,7 +231,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'xml_well_formdness_check', 'xml_well_formdness_check Documentation',
+    ('index', 'xml_well_formedness_check', 'xml_well_formedness_check Documentation',
      ['Matjaz Pirnovar'], 1)
 ]
 
@@ -245,8 +245,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'xml_well_formdness_check', 'xml_well_formdness_check Documentation',
-   'Matjaz Pirnovar', 'xml_well_formdness_check', 'One line description of project.',
+  ('index', 'xml_well_formedness_check', 'xml_well_formedness_check Documentation',
+   'Matjaz Pirnovar', 'xml_well_formedness_check', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -266,13 +266,13 @@ texinfo_documents = [
 # -- Options for Epub output ----------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = 'xml_well_formdness_check'
+epub_title = 'xml_well_formedness_check'
 epub_author = 'Matjaz Pirnovar'
 epub_publisher = 'Matjaz Pirnovar'
 epub_copyright = '2015, Matjaz Pirnovar'
 
 # The basename for the epub file. It defaults to the project name.
-#epub_basename = 'xml_well_formdness_check'
+#epub_basename = 'xml_well_formedness_check'
 
 # The HTML theme for the epub output. Since the default themes are not optimized
 # for small screen space, using the same theme for HTML and epub output is

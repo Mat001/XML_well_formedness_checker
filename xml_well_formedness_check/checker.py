@@ -541,7 +541,7 @@ def no_invalid_content_after_root_tag():
     last_char = getstring()[-1]
     after = getstring()[-1:]
     if last_char != '>' and after != '':
-        print('Content after the ending root tag is disallowed.')
+        print('Content after the ending root tag is disallowed. Even spaces - please delete them.')
         return False
     else:
         return True
@@ -617,7 +617,7 @@ if number_of_angle_brackets_is_even():
                                                                         #print('Comment closing tags dont have extra dash: ', comment_closing_tags_dont_have_extra_dash())
                                                                             if no_restricted_characters_in_content():
                                                                                 #print('No restricted characters in content: ', no_restricted_characters_in_content())
-                                                                                if no_invalid_content_before_and_after_root_tag():
+                                                                                if no_invalid_content_after_root_tag():
                                                                                     #print('No invalid content before or after the root tag: ', no_invalid_content_before_and_after_root_tag())
                                                                                     print('Document is well formed!')
 
