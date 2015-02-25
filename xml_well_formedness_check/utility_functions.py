@@ -14,7 +14,7 @@ def getstring():
 
     xml_string = ''
     with open('/home/matjaz/PycharmProjects/xml_well_formedness_check/'
-              'xml_well_formedness_check/xml_example2.txt', 'r') as f:
+              'xml_well_formedness_check/xml_example.txt', 'r') as f:
         for i in f:
             xml_string = xml_string + i
         return xml_string
@@ -80,8 +80,6 @@ def get_clean_tags():
         if '<?' in item:
             without_declarations_and_comments.remove(item)
             #print(without_declarations_and_comments)
-
-
 
     no_slash = [tag.replace('/', '') for tag in without_declarations_and_comments]
     split = [tag.split() for tag in no_slash]
@@ -157,16 +155,20 @@ def get_single_elements():
     Get single elements (eg <example/> <br       />, <acb />, <child attribute="value" />)
     :return: list of single elements in order of appearance in xml file (top down)
     """
-    position = []
-    for i in get_clean_tags():
-        if get_clean_tags().count(i) == 1:  # if number of occurrences of a tag is one, then it's a single tag
-            position.append(get_clean_tags().index(i))  # store position of the single element
+    # get all tags and clean them up
+    tags = remove_declaration_doctype_comments()
 
-    # retrieve the full tags by using its position
-    single_tags = [get_all_tags_in_order()[i] for i in position]    # BUGGG !!!!! DOn't USE all tags in order. remove dcar, doctyp and comments !!!
-    return single_tags
+    # dump singles in a list
+    list_of_singles = [ tag for tag in tags if tag.endswith('/>') ]
+
+    # what about singles that don't end with />, like errors such as <br >
+    # what about when I have two or more of same (or diff) singles that don't end with /> like <br >, <br >
+    return list_of_singles
 
 
+# ****************************************************************************************************
+#   GET DATA CONTENT
+# ****************************************************************************************************
 def get_data_content():
     """
 
@@ -196,17 +198,68 @@ def get_data_content():
     return content
 
 
+# ****************************************************************************************************
+#   GET NUMBER OF ALL TAGS EXCLUDING DECLARATIONS, DOCTYPE AND COMMENTS - utility function
+# ****************************************************************************************************
+def get_number_of_all_tags_excluding_declar_doctype_comments():
+    # get all tags and clean them up
+    without_declarations_and_comments = get_all_tags_in_order()
+
+    for item in get_all_tags_in_order():
+        if '<!' in item:
+            without_declarations_and_comments.remove(item)
+            #print(without_declarations_and_comments)
+        if '<?' in item:
+            without_declarations_and_comments.remove(item)
+            #print(without_declarations_and_comments)
+
+    return len(without_declarations_and_comments)
 
 
+# ****************************************************************************************************
+#   FIND DUPLICATE TAGS - utility function
+# ****************************************************************************************************
+def find_duplicate_tags():
+    """
+    Find duplicate tags.
+    :return: list of duplicate tags
+    """
+    without_declarations_and_comments = get_all_tags_in_order()
+
+    for item in get_all_tags_in_order():
+        if '<!' in item:
+            without_declarations_and_comments.remove(item)
+            # print(without_declarations_and_comments)
+        if '<?' in item:
+            without_declarations_and_comments.remove(item)
+            # print(without_declarations_and_comments)
+
+    without_singles = [tag for tag in without_declarations_and_comments if '/>' not in tag]
+
+    duplicates = set([tag for tag in without_singles if without_singles.count(tag) > 1])
+    duplicates = list(duplicates)
+
+    return duplicates
 
 
+# ****************************************************************************************************
+#   REMOVE DECLARATIONS, DOCTYPE AND COMMENTS - utility function
+# ****************************************************************************************************
+def remove_declaration_doctype_comments():
+    """
+    Removes xml declartion, doctype and comment tags for easier processing of remaining elements.
+    :return: list of elements
+    """
+    # clean up tags from scratch and remove single elements (they don't affect nesting)
+    without_declarations_and_comments = get_all_tags_in_order()
 
+    for item in get_all_tags_in_order():
+        if '<!' in item:
+            without_declarations_and_comments.remove(item)
+            # print(without_declarations_and_comments)
+        if '<?' in item:
+            without_declarations_and_comments.remove(item)
+            # print(without_declarations_and_comments)
 
-
-
-
-
-
-
-
+    return without_declarations_and_comments
 

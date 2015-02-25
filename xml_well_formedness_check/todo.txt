@@ -1,0 +1,159 @@
+TO DO:
+    FIX functions:
+    - check function paired_elements_are_closed_properly_and_names_match() - line print('l_no_attributes: ', l) gives 7 <body> elements !!!
+        also for ex. </hello> element in xml is not picked up by th program!
+    - check comments in all functions (including utilities) for bugs, problems
+    - see what else is needed from the list (ignore attribs for now)
+    - clean up docstrings
+    - test
+
+
+# ****************************************************************************************************
+#   XML RULES
+# ****************************************************************************************************
+
+D    XML file must start with XML declaration.
+        Example: <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+D   Must be only one root element and needs to have opening and closing tag.
+D    Child elements (except XML declar. and !DOCTYPE (any others??)) need to be within the root element as its children.
+D    Nested child elements need to be within their parents (elements must be properly nested).
+D    Elements can have opening and closing tag AND can be single!
+        <tag></tag>, <dd/>, <acb />, <child attribute="value" />
+        (IMPORTANT - NOTE THIS LAST THREE SINGLE EMPTY TAGS - DON'T HAVE THEIR PAIRS!)
+D    Single elements are empty and have forward slash before closing bracket.
+
+D?    Element names must not contain spaces (<dateofbirth> is correct, <date of birth> is incorrect ).
+D    Element names must not start with digits, diacritics, the full stop, the hyphen(minus) and 'xml' (any letter case).
+D    Element names must start with letter (uppercase or lowercase), underscore, or colon.
+D    Element names can contain colon, hyphen-minus, full stop (period), low line (underscore), and middle dot.
+        Permitted: - W3schools xml validator doesn't allow to start with : or _  -strange!
+            axiom
+            _axiom_26
+            :axiom_veintiséis
+            ora:open.source
+
+            All of these names begin with a letter, an underscore, or a colon,
+            followed by any combination of letters, digits, underscores, colons, and periods.
+        Not permitted:
+
+            #axiom
+            @axiom
+            26th_of_month
+            axiom#26
+
+            The first three begin with something other than a letter, underscore, or colon; the last starts out all right,
+            but falls apart because the # is not a legitimate name character.
+
+D    Must be no space between opening bracket and the name of an element.
+D    Element names must be the same in opening and closing tag.
+D    Elements must be closed properly: <child>Data</child>, <child attribute="value" />
+D?   Tags are case sensitive.
+D    Comments must be within comment tags <!-- -->.
+D    Comments are not allowed to end with --->.
+D    Matjaz: Comments (comment tags) must not be nested inside other comments.
+D    Closing tags don't have attributes.
+
+
+
+    Must allow multiple whitespace characters - define where!
+    There may be whitespace between the end of the name or attribute in an opening element tag and the closing
+    bracket of that element.
+        Example: <body   > is allowed
+    All data content must be within element tags (not inside tags). (how to chcek that???)
+
+    Attributes must have both quotation marks around attribute's value.
+    An attribute name must not appear more than once in the same start tag.
+    Attribute values must not contain entity references to external entities.
+    Single elements can contain attributes.
+    '<' character is not allowed in attribute values. ('>' is allowed????)
+
+    ----------------------------------
+D?  SPECIAL CHARACTERS to escape in XML - should not appear in xml document content- must be escape with the following terms:
+    CHECK IS THIS FOR NAMES OR DATA CONTENT?????
+        "   &quot;
+        '   &apos;
+        <   &lt;
+        >   &gt;
+        &   &amp;
+
+    (from w3.org) - for DATA CONTENT:
+    The ampersand character (&) and the left angle bracket (<) MUST NOT appear in their literal form,
+    except when used as markup delimiters, or within a comment, a processing instruction, or a CDATA section.
+    If they are needed elsewhere, they MUST be escaped using either numeric character references or
+    the strings " &amp; " and " &lt; " respectively. The right angle bracket (>) may be represented
+    using the string " &gt; ", and MUST, for compatibility, be escaped using either " &gt; " or
+    a character reference when it appears in the string " ]]> " in content, when that string
+    is not marking the end of a CDATA section.
+
+    ALSO SEE https://stackoverflow.com/questions/730133/invalid-characters-in-xml:
+    The < MUST be escaped with a &lt; entity, since it is assumed to be the beginning of a tag.
+    The & MUST be escaped with a &amp; entity, since it is assumed to be the beginning a entity reference
+    The > should be escaped with &gt; entity. It is not mandatory -- it depends on the context -- but it is strongly advised to escape it.
+    The ' should be escaped with a &apos; entity -- mandatory in attributes defined within single quotes but it is strongly advised to always escape it.
+    The " should be escaped with a &quot; entity -- mandatory in attributes defined within double quotes but it is strongly advised to always escape it.
+    ---------------------------------
+
+    Data content must be within root element. Must not be outside of root element.
+D    Data content must be in between any two > and < brackets.
+        (Data content can be nested. It can appear like this:
+            <tagA>
+            aaa
+                <tagB>bbb</tagB>
+            </tagA>)
+
+    MISC (for later):
+    Doctype (DTD) declaration: <!DOCTYPE greeting SYSTEM "hello.dtd">
+        Recommended doctype declarations: http://www.w3.org/QA/2002/04/valid-dtd-list.html
+        Example why DTD is important:
+            If you have created your own XML elements, attributes, and/or entities, then you should create a DTD.
+            A DTD consists of a list of syntax definitions for each element in your XML document.
+            When you create a DTD, you are creating the syntax rules for any XML document that uses the DTD.
+            You are specifying which element names can be included in the document, the attributes that each
+            element can have, whether or not these are required or optional, and more.
+    Ensure CDATA applies (data is not parsed).
+    CDATA sections may occur anywhere character data may occur (in between tags).
+
+    Processing instructions (PI) should not start with 'xml'
+    Referencing CSS example: <?xml-stylesheet type="text/css" href="tutorials.css"?>. Check that instead of href,
+    a path to file can be used too
+    Referencing scripts example: <script type="text/javascript">
+    Referencing images
+    Referencing links
+    Referencing Schemas (XSD)
+
+
+# ****************************************************************************************************
+#   TESTING COMMENT TAGS AND COMMENTS
+# ****************************************************************************************************
+
+    Check that comment tags are formed correctly.
+    Opening and closing bracket must be there, including the exclamation m. and all the dashes.
+
+    TAKE INTO ACCOUNT:
+    - what if one bracket is missing (add condition number_of_tags_must_be_even? - maybe two brackets are missing!)
+    what if one of the dashes is missing, for example <!-   -->
+    what if two, three of the dashes are missing
+    what if one or two or three extra dashes are added
+    what if exclamation mark is missing
+    note that comments can encapsulate several lines with xml code in between
+    note that if item has <!-- then the first closing bracket > should have --> doesn't apply
+    because comments can have < > inside them
+
+    Follow the rule that comments can have start and close tag just about anywhere in the xml
+    as long as start and end tag complement each other and have proper syntax <!-- and -->.
+    So only check that they are a pair and that proper syntax.
+    Prevent this:
+    <!--
+    <!-- more xml -->
+    -->
+
+    # chack that all opening tags have format <!--
+    # check that all closing tags have format -->
+    # check that closing format ---> is not present
+    # check that comment element is not nested within another comment element
+
+    # check that for each opening there is a closing tag (even number of both - is that enough?)
+    # every opening tag must be immediatelly followed by a closing tag -
+    # that may prevent nesting - preceeding point!
+
+    # check that and < and > inside comments don't intefere with opening and closing comment tags

@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE greeting SYSTEM "hello.dtd">
-<note Id=''>
-    <to b " = 111">
+<note &Id=''>
+    <to b = "111">
     <aaa/>
     <!-- this a test xml file -->
-        <firstname b="12">Tove</firstname>
+        <firstname b="12">Tov%e</firstname>
         <lastname a= " sds">Brown John</lastname>
     <from >
     <br />
     <!-- -->
-    Jani</from>
+    Jani</from></hello>
     </to>
-    <!-- this a test xml file--->
-    <br#$% />
+    <!-- this a test xml file -->
+    <br />
     <heading>Reminder</heading>
-    <body id=>Dont forget me this weekend!
-</note>
+    <body id="">Dont forget me this weekend!
+
 </body>
+</note>
