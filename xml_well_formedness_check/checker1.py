@@ -87,6 +87,7 @@ def starts_with_xml_declaration():
 
 def root_tags_match():
     """ Compare opening and closing root element if they match.
+    :return: boolean
     """
     # check if the names of the root tags match
 
@@ -534,7 +535,7 @@ def no_restricted_characters_in_content():
 # ****************************************************************************************************
 def no_invalid_content_after_root_tag():
     """
-    And that there is nothiung below the ending root tag
+    And that there is nothing below the ending root tag
     :return: boolean
     """
     # check after the ending root tag

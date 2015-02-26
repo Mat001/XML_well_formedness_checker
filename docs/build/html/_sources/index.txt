@@ -1,5 +1,5 @@
-Welcome to xml_well_formdness_check's documentation!
-====================================================
+Welcome to xml_well_formedness_check's documentation!
+=====================================================
 
 Contents:
 

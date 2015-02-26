@@ -3,7 +3,7 @@ Test cases to test checker1 module.
 '''
 
 
-from xml_well_formedness_check.checker import *
+from xml_well_formedness_check.checker1 import *
 
 
 def test_get_string():

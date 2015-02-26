@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Auto Generated Documentation &mdash; xml_well_formdness_check 1.0.0 documentation</title>
+    <title>Auto Generated Documentation &mdash; xml_well_formedness_check 1.0.0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="xml_well_formdness_check 1.0.0 documentation" href="index.html" />
+    <link rel="top" title="xml_well_formedness_check 1.0.0 documentation" href="index.html" />
     <link rel="next" title="Contact" href="Contact.html" />
     <link rel="prev" title="Project Summary" href="Project Summary.html" /> 
   </head>
@@ -35,12 +35,15 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="Contact.html" title="Contact"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="Project Summary.html" title="Project Summary"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">xml_well_formdness_check 1.0.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">xml_well_formedness_check 1.0.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -49,159 +52,79 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="auto-generated-documentation">
-<h1>Auto Generated Documentation<a class="headerlink" href="#auto-generated-documentation" title="Permalink to this headline">¶</a></h1>
-<dl class="docutils">
-<dt>D    XML file must start with XML declaration.</dt>
-<dd>Example: &lt;?xml version=&#8221;1.0&#8221; encoding=&#8221;UTF-8&#8221; standalone=&#8221;no&#8221;?&gt;</dd>
-</dl>
-<p>D   Must be only one root element and needs to have opening and closing tag.
-D    Child elements (except XML declar. and !DOCTYPE (any others??)) need to be within the root element as its children.
-D    Nested child elements need to be within their parents (elements must be properly nested).</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>Elements can have opening and closing tag AND can be single!</dt>
-<dd>&lt;tag&gt;&lt;/tag&gt;, &lt;dd/&gt;, &lt;acb /&gt;, &lt;child attribute=&#8221;value&#8221; /&gt;
-(IMPORTANT - NOTE THIS LAST THREE SINGLE EMPTY TAGS - DON&#8217;T HAVE THEIR PAIRS!)</dd>
-</dl>
-<p>Single elements are empty and have forward slash before closing bracket.
-Single elements can contain attributes.</p>
-</div></blockquote>
-<p>D    Element names must not start with digits, diacritics, the full stop, the hyphen and &#8216;xml&#8217; (any letter case).
-D    Element names must start with letter (uppercase or lowercase), underscore, or colon.</p>
-<blockquote>
-<div>Element names can contain colon, hyphen-minus, full stop (period), low line (underscore), and middle dot.</div></blockquote>
-<dl class="docutils">
-<dt>D    Element names must not contain spaces (&lt;dateofbirth&gt; is correct, &lt;date of birth&gt; is incorrect ).</dt>
-<dd><dl class="first docutils">
-<dt>Permitted:</dt>
-<dd><p class="first">axiom
-_axiom_26
-:axiom_veintiséis
-ora:open.source</p>
-<p class="last">All of these names begin with a letter, an underscore, or a colon,
-followed by any combination of letters, digits, underscores, colons, and periods.</p>
-</dd>
-</dl>
-<p>Not permitted:</p>
-<blockquote class="last">
-<div><p>#axiom
-&#64;axiom
-26th_of_month
-axiom#26</p>
-<p>The first three begin with something other than a letter, underscore, or colon; the last starts out all right,
-but falls apart because the # is not a legitimate name character.</p>
-</div></blockquote>
-</dd>
-</dl>
-<p>D    Must be no space between opening bracket and the name of an element.
-?    Element names must be the same in opening and closing tag.</p>
-<blockquote>
-<div>Elements must be closed properly: &lt;child&gt;Data&lt;/child&gt;, &lt;child attribute=&#8221;value&#8221; /&gt;</div></blockquote>
-<dl class="docutils">
-<dt>D   Tags are case sensitive.</dt>
-<dd><p class="first">Attributes must have both quotation marks around attribute&#8217;s value.
-Comments must be within comment tags &lt;!&#8211; &#8211;&gt;.
-Comments are not allowed to end with &#8212;&gt;.
-An attribute name must not appear more than once in the same start tag.
-Closing tags don&#8217;t have attributes.
-Attribute values must not contain entity references to external entities.
-&#8216;&lt;&#8217; character is not allowed in attribute values. (&#8216;&gt;&#8217; is allowed????)
-All data content must be within element tags (not inside tags).
-XML must allow multiple whitespace characters.
-There may be whitespace between the end of the name or attribute in an opening element tag and the closing
-bracket of that element.</p>
-<blockquote>
-<div>Example: &lt;body   &gt; is allowed</div></blockquote>
-<p>Characters to escape in XML - should not appear in xml document content- do flag error, except if replaced
-by char. entity reference:</p>
-<blockquote>
-<div>&#8221;   &amp;quot;
-&#8216;   &amp;apos;
-&lt;   &amp;lt;
-&gt;   &amp;gt;
-&amp;   &amp;amp;</div></blockquote>
-<dl class="docutils">
-<dt>Doctype (DTD) declaration: &lt;!DOCTYPE greeting SYSTEM &#8220;hello.dtd&#8221;&gt;</dt>
-<dd><p class="first">Recommended doctype declarations: <a class="reference external" href="http://www.w3.org/QA/2002/04/valid-dtd-list.html">http://www.w3.org/QA/2002/04/valid-dtd-list.html</a>
-Example why DTD is important:</p>
-<blockquote class="last">
-<div>If you have created your own XML elements, attributes, and/or entities, then you should create a DTD.
-A DTD consists of a list of syntax definitions for each element in your XML document.
-When you create a DTD, you are creating the syntax rules for any XML document that uses the DTD.
-You are specifying which element names can be included in the document, the attributes that each
-element can have, whether or not these are required or optional, and more.</div></blockquote>
-</dd>
-</dl>
-<p>Ensure CDATA applies (data is not parsed).
-CDATA sections may occur anywhere character data may occur (in between tags).</p>
-<p class="last">Processing instructions (PI) should not start with &#8216;xml&#8217;
-Referencing CSS example: &lt;?xml-stylesheet type=&#8221;text/css&#8221; href=&#8221;tutorials.css&#8221;?&gt;. Check that instead of href,
-a path to file can be used too
-Referencing scripts example: &lt;script type=&#8221;text/javascript&#8221;&gt;
-Referencing images
-Referencing links
-Referencing Schemas (XSD)</p>
-</dd>
-</dl>
+  <div class="section" id="module-checker1">
+<span id="auto-generated-documentation"></span><h1>Auto Generated Documentation<a class="headerlink" href="#module-checker1" title="Permalink to this headline">¶</a></h1>
+<p>This project is a program to validate well-formedness of XML files.
+author: Matjaz Pirnovar
+date: Feb 2015</p>
 <dl class="function">
-<dt id="checker1.each_element_has_strictly_two_identical_names_for_each_tag">
-<tt class="descclassname">checker1.</tt><tt class="descname">each_element_has_strictly_two_identical_names_for_each_tag</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.each_element_has_strictly_two_identical_names_for_each_tag" title="Permalink to this definition">¶</a></dt>
-<dd><p>More of a helper function.
-Checks that all tag names, opening and closing have their corresponding pair.
-For example, there should not be three names for an element, but strictly two (opening and closing)
-:return: boolean True or False</p>
+<dt id="checker1.all_lowercase_tags">
+<tt class="descclassname">checker1.</tt><tt class="descname">all_lowercase_tags</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.all_lowercase_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that tags are case sensitive.
+For now, ensure all tag names are lower case.
+:return: boolean</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="checker1.get_all_tags_in_order">
-<tt class="descclassname">checker1.</tt><tt class="descname">get_all_tags_in_order</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.get_all_tags_in_order" title="Permalink to this definition">¶</a></dt>
-<dd><p>[ ASSUMES THAT ALL ANGLE BRACKETS ARE PRESENT!!! AND THAT THERE ARE NO EXTRA ANGLE BRACKETS!
-IF IN DOUBT THEN CHECK THAT ALL ANGLE BRACKETS ARE OKAY FIRST. ]
-Get all tags (opening, closing) in order of appearance top down
-Procedure:
-get positions of opening and closing brackets
-pair up tag positions into list of tuples
-get a list of all tags
-:return: list of tags in order (top down)</p>
+<dt id="checker1.closing_tag_incorrectly_formed">
+<tt class="descclassname">checker1.</tt><tt class="descname">closing_tag_incorrectly_formed</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.closing_tag_incorrectly_formed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that closing tags start with &#8216;&lt;/&#8217; .
+:return: boolean</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="checker1.get_clean_tags">
-<tt class="descclassname">checker1.</tt><tt class="descname">get_clean_tags</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.get_clean_tags" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get all tags
-Clean the up so you get a list of element names in order as they appear in xml file top-down
-:return: list</p>
+<dt id="checker1.closing_tags_that_are_not_single_dont_have_attributes">
+<tt class="descclassname">checker1.</tt><tt class="descname">closing_tags_that_are_not_single_dont_have_attributes</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.closing_tags_that_are_not_single_dont_have_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that closing tags that are not single don&#8217;t have attributes.
+Here the check is made on absence of spaces in closing tag.
+That automatically implies no attributes.
+:return: boolean</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="checker1.get_root_element">
-<tt class="descclassname">checker1.</tt><tt class="descname">get_root_element</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.get_root_element" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the root element:
-Iterate through all tags (provided by get_all_tags_in_order() function )
-Get the first tag that doesn&#8217;t have ? or ! after opening bracket
-Get the very last tag
-:return: root element tuple</p>
+<dt id="checker1.comment_closing_tags_dont_have_extra_dash">
+<tt class="descclassname">checker1.</tt><tt class="descname">comment_closing_tags_dont_have_extra_dash</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.comment_closing_tags_dont_have_extra_dash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that comment closing tags don&#8217;t have extra dash (&#8212;&gt;).
+:return: boolean</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="checker1.getstring">
-<tt class="descclassname">checker1.</tt><tt class="descname">getstring</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.getstring" title="Permalink to this definition">¶</a></dt>
-<dd><p>put xml content from file into a string (also make sure you use try/except!)
-:return: xml_string</p>
+<dt id="checker1.element_names_contain_only_valid_characters">
+<tt class="descclassname">checker1.</tt><tt class="descname">element_names_contain_only_valid_characters</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.element_names_contain_only_valid_characters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rule 1:
+Name must begin with letter (uppercase or lowercase), underscore, or colon
+and CONTINUING with letters, digits, hyphens, underscores, colons, or full stops.
+Middle dot also allowed (unlikely to be seen in xml).
+(source: <a class="reference external" href="http://www.xml.com/pub/a/2001/07/25/namingparts.html">http://www.xml.com/pub/a/2001/07/25/namingparts.html</a> and <a class="reference external" href="http://www.w3.org/TR/xml/#sec-well-formed">http://www.w3.org/TR/xml/#sec-well-formed</a>)</p>
+<ul class="simple">
+<li>Doesnt check initial character rules (already covered)</li>
+<li>Doesn&#8217;t check for initial space in name (already covered)</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
-<dt id="checker1.is_attribute_correctly_formed">
-<tt class="descclassname">checker1.</tt><tt class="descname">is_attribute_correctly_formed</tt><big>(</big><em>tag</em><big>)</big><a class="headerlink" href="#checker1.is_attribute_correctly_formed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Only checks if attribute is properly formed, not spaces before the atrribute name.</p>
+<dt id="checker1.is_comment_opening_tag_followed_by_closing_tag">
+<tt class="descclassname">checker1.</tt><tt class="descname">is_comment_opening_tag_followed_by_closing_tag</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.is_comment_opening_tag_followed_by_closing_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p># Check that each opening comment tag is followed by closing tag
+Sequence of comment tags must follow: opening-closing_opening_closing.
+Disallow two of the same one after the other. This will check for nesting.
+:return: boolean</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="checker1.is_nesting_proper">
 <tt class="descclassname">checker1.</tt><tt class="descname">is_nesting_proper</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.is_nesting_proper" title="Permalink to this definition">¶</a></dt>
 <dd><p>CHECK THAT NESTING IS PROPER</p>
-<p>Iterate through the list of cleaned, ordered tags
+<p>Symmetry approach using stack:
+Iterate through the list of cleaned, ordered tags
 If item is not in (initially empty) temp list, then append item
 else if item is the last element in the temp list, then pop it out
 else - if item doesn&#8217;t match the last item in the temp list, then that item was incorrectly nested. we flag error.</p>
@@ -213,21 +136,19 @@ For example &lt;to&gt;&lt;from&gt;&lt;lastname&gt;&lt;/lastname&gt;&lt;/to&gt;&l
 </dd></dl>
 
 <dl class="function">
-<dt id="checker1.no_case_sensitive_tags">
-<tt class="descclassname">checker1.</tt><tt class="descname">no_case_sensitive_tags</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.no_case_sensitive_tags" title="Permalink to this definition">¶</a></dt>
-<dd><p>BUG !!!!!!!!!!!!!!!!  : line not_matching = [ i for i in unique_pairs if clean[i[0]] != clean[i[1]] ].
-WHEN SPACE IS INSERTED INTO TAG NAMES LIST ABOVE GOES OUT OF RANGE.
-This is probably because I&#8217;m splitting on spaces. ANd each time whitespace splits a tag
-there is more elements in the list?</p>
-<p>Check that tags are case sensitive.</p>
-<p># get all tags and clean them up
-# change cleaned list of tags to lowercase
-# create a list of tag pairs (list of lists)
-# remove duplicate pairs
-# remove any single tags (eg remaining unpairable tags, such as those for XML declaration or DTD)
-# make final comparison if pairs match. Returns a list of their indexes.
-# get textual version of mismatched elements, if any. - for informative/ printing purposes.
-# return True of number of mismatches is zero, False otherwise</p>
+<dt id="checker1.is_number_of_comment_tags_even">
+<tt class="descclassname">checker1.</tt><tt class="descname">is_number_of_comment_tags_even</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.is_number_of_comment_tags_even" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if number of commnt tags is even
+- utility function
+:return: boolean</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="checker1.no_duplicate_tags">
+<tt class="descclassname">checker1.</tt><tt class="descname">no_duplicate_tags</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.no_duplicate_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check for exactly identical tags. Should never occur, except for comments and single elements.
+Paired elements need closing tag.
+:return: boolean</p>
 </dd></dl>
 
 <dl class="function">
@@ -238,12 +159,41 @@ there is more elements in the list?</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="checker1.no_invalid_content_after_root_tag">
+<tt class="descclassname">checker1.</tt><tt class="descname">no_invalid_content_after_root_tag</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.no_invalid_content_after_root_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>And that there is nothing below the ending root tag
+:return: boolean</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="checker1.no_invalid_initial_characters_in_opening_tag">
 <tt class="descclassname">checker1.</tt><tt class="descname">no_invalid_initial_characters_in_opening_tag</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.no_invalid_initial_characters_in_opening_tag" title="Permalink to this definition">¶</a></dt>
-<dd><p>DOESN&#8217;T DO ANYTHING ABOUT &amp;, ^, %, $, # etc. CHECK WHAT TO DO HERE? Specification allows them?</p>
-<p>Element names must not start with digits, diacritics, the full stop, the hyphen and &#8216;xml&#8217; (any letter case).
+<dd><p>Element names must not start with digits, diacritics, the full stop, the hyphen and &#8216;xml&#8217; (any letter case).
 Element names must start with letter (uppercase or lowercase), underscore, or colon.
 :return: boolean</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="checker1.no_restricted_characters_in_content">
+<tt class="descclassname">checker1.</tt><tt class="descname">no_restricted_characters_in_content</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.no_restricted_characters_in_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>TO SIMPLIFY, LIMIT RESTRICTED CHARS TO: &lt;,&gt;,&amp;
+WARNING: DOESN&#8217;T YET HANDLE REPLACEMENTS WITH &amp;quot; &amp;apos; etc.</p>
+<p>Characters &#8221;, &#8216;, &lt;, &gt;, &amp; must not appear in xml document content.
+They need to be replaced by:</p>
+<blockquote>
+<div>&#8221;   &amp;quot;
+&#8216;   &amp;apos;
+&lt;   &amp;lt;
+&gt;   &amp;gt;
+&amp;   &amp;amp;</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -254,27 +204,56 @@ Element names must start with letter (uppercase or lowercase), underscore, or co
 </dd></dl>
 
 <dl class="function">
-<dt id="checker1.no_spaces_in_tag_names">
-<tt class="descclassname">checker1.</tt><tt class="descname">no_spaces_in_tag_names</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.no_spaces_in_tag_names" title="Permalink to this definition">¶</a></dt>
-<dd><p># separate illegal tags with spaces from legal tags with attributes
-# it will be attribute if it contains at least equal sign or two quotes or both</p>
-<p># it&#8217;s an attribute if after compact term and after whitespace it has equal sign and/or quote(s)
-# to follow style: &lt;term attribute=&#8221;&#8220;&gt;</p>
-<p># exclude closing tags with space
-# function exits as soon as it hits the first tag with illegal space (doesn&#8217;t do remaining tags)</p>
-</dd></dl>
-
-<dl class="function">
 <dt id="checker1.number_of_angle_brackets_is_even">
 <tt class="descclassname">checker1.</tt><tt class="descname">number_of_angle_brackets_is_even</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.number_of_angle_brackets_is_even" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check that number of angle brackets (&lt;,&gt;) is even.
+PS: Not a full test of matching brackets! For example even number of closing brackets
+could be missing or be added and the number would still be even.
 :return: sum of all angle brackets (as length of the list)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="checker1.number_of_opening_and_closing_brackets_match">
+<tt class="descclassname">checker1.</tt><tt class="descname">number_of_opening_and_closing_brackets_match</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.number_of_opening_and_closing_brackets_match" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get number of opening and closing brackets and compare if the number matches.
+:return: boolean</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="checker1.paired_elements_are_closed_properly_and_names_match">
+<tt class="descclassname">checker1.</tt><tt class="descname">paired_elements_are_closed_properly_and_names_match</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.paired_elements_are_closed_properly_and_names_match" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that paired elements (not single ones) are closed properly.
+Based on the fact that number of &lt; must match number of &lt;/.
+If it doesn&#8217;t, then either &lt; or &lt;/ are mis-formatted or are missing.
+:return: boolean</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="checker1.root_tags_match">
 <tt class="descclassname">checker1.</tt><tt class="descname">root_tags_match</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.root_tags_match" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compare opening and closing root element if they match.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="checker1.single_element_is_correctly_formed_case_without_attribute">
+<tt class="descclassname">checker1.</tt><tt class="descname">single_element_is_correctly_formed_case_without_attribute</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.single_element_is_correctly_formed_case_without_attribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that single elements are correctly formed.
+Examples: &lt;example/&gt; &lt;br       /&gt;, &lt;acb /&gt;, &lt;child attribute=&#8221;value&#8221; /&gt;</p>
+<p># Done so far:
+# Includes proper closure!
+# Not checking for space between name and / because it is allowed. It&#8217;s for attributes, which still need to be checked.
+# checking that there is no space between / and &gt;
+# first part of the tag &lt;... is already checked because functions no_initial_space_in_opening_tags(), ... take car of it
+# closing tag /&gt; is validated here - no space between / and &gt;
+# in between it&#8217;s okay to have space - for attribute - which still need to be checked
+:return: boolean</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="checker1.starts_with_xml_declaration">
+<tt class="descclassname">checker1.</tt><tt class="descname">starts_with_xml_declaration</tt><big>(</big><big>)</big><a class="headerlink" href="#checker1.starts_with_xml_declaration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that file starts with xml declaration
+:return: boolean</p>
 </dd></dl>
 
 </div>
@@ -320,12 +299,15 @@ Element names must start with letter (uppercase or lowercase), underscore, or co
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="Contact.html" title="Contact"
              >next</a> |</li>
         <li class="right" >
           <a href="Project Summary.html" title="Project Summary"
              >previous</a> |</li>
-        <li><a href="index.html">xml_well_formdness_check 1.0.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">xml_well_formedness_check 1.0.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

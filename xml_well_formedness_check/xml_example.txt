@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>bbb
-ccc<!DOCTYPE greeting SYSTEM "hello.dtd">ddd
-eee<note &id=''>fff
+<!DOCTYPE greeting SYSTEM "hello.dtd">ddd
+<note &id=''>fff
     <to b = "111"><aaa  />
     <aaa/>
     <!-- this a test xml file -->
