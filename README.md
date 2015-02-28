@@ -6,7 +6,7 @@ Used IDE PyCharm 4.
 The app reads an XML file, parses it and confirms that the file is well formed.
 Warning message informs user if any errors.
 
-The app has two main files:
+The app has three main files:
 - checker1.py
 - utility_functions.py
 - sample xml file
