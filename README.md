@@ -14,6 +14,7 @@ The app has three main files:
 The rest are docs and tests (tests currently empty).
 
 To use the app:
-Put checker1.py, utility_functions.py and yuor test file into the same directory.
-1. funntion get_string() in utility_functions.py spcify the path to the xml file.
-2. Run the program by invoking checker1.py.
+Put checker1.py, utility_functions.py and your test file into the same directory.
+1. in funtion get_string() in utility_functions.py specify the path to the xml file.
+2. on unix systems in terminal go to top directory xml_well_formedness_check.
+3. run the program by: python3 xml_well_formedness_check/checker1.py.
