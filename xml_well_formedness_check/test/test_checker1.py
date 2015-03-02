@@ -30,11 +30,12 @@ def test_number_of_angle_brackets_is_even():
 def test_get_all_tags_in_order():
     pass
 
-def test_each_element_has_strictly_two_identical_names_for_each_tag():
-    #assert each_element_has_strictly_two_identical_names_for_each_tag()
+def test_paired_elements_are_closed_properly_and_names_match():
     pass
 
 
+def element_names_lowercase():
+    pass
 
 
 

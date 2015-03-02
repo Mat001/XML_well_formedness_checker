@@ -90,12 +90,11 @@ def get_clean_tags():
     IF IN DOUBT THEN CHECK THAT ALL ANGLE BRACKETS ARE OKAY FIRST.
      FOR EXAMPLE IF THERE IS EXTRA SINGLE COMMENT TAG, THIS WILL FAIL
 
-     - RUN is_number_of _angle_brackets_even() function first !!!!!!! User needs to fix that first, then run this function.
-     SHIT - note: this functioin is fine with one extra < bracket and <>!, but not with one extra > or ><. FIX!
+     - RUN is_number_of _angle_brackets_even() function first! User needs to fix that first, then run this function.
      ]
 
     Get all tags
-    Clean the up so you get a list of element names in order as they appear in xml file top-down
+    Clean up so you get a list of element names in order as they appear in xml file top-down
     :return: list
     """
     # get all tags and clean them up
@@ -113,7 +112,7 @@ def get_clean_tags():
             #print(without_declarations_and_comments)
 
     no_slash = [tag.replace('/', '') for tag in without_declarations_and_comments]
-    split = [tag.split() for tag in no_slash]
+    split = [tag.split() for tag in no_slash]   # problem: if I split when tag has initial space, it doesn't work. Gives '' for < from >
     first_part = [part[0] for part in split]
 
     clean = []
@@ -202,7 +201,6 @@ def get_single_elements():
 # ****************************************************************************************************
 def get_data_content():
     """
-
     TRICKY: < and > in content THROW OFF get_clean_tags() FUNCTION INDEX OUT OF RANGE.
     MAYBE DO FUNCTIONS THAT CHECK FOR EVEN NUMBER OF TAGS ETC FIRST.
 
@@ -271,9 +269,3 @@ def find_duplicate_tags():
     duplicates = list(duplicates)
 
     return duplicates
-
-
-
-
-
-

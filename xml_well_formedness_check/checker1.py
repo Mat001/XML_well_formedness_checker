@@ -128,8 +128,7 @@ def no_initial_space_in_opening_tags():
         if tag[1] == ' ':
             print('Space immediatelly after \'<\' not allowed.', tag)
             return False
-        else:
-            return True
+    return True
 
 
 # ****************************************************************************************************
@@ -144,8 +143,7 @@ def no_spaces_in_closing_tags():
         if tag[1] == '/' and ' ' in tag[1:]:
             print('Closing tag must not have spaces.', tag)
             return False
-        else:
-            return True
+    return True
 
 
 # ****************************************************************************************************
@@ -192,18 +190,19 @@ def no_invalid_initial_characters_in_opening_tag():
                 print('Tag with invalid start character: ', tag)
                 return False
 
+
     # Check that element names DO start with letter (uppercase or lowercase), underscore, or colon.
-    for tag in get_all_tags_in_order():
-        if tag[1] != '?' and tag[1] != '!':     #make sure that names starting with ? and ! pass through
-            if tag[1].isalpha():
-                return True
-            elif tag[1] == '_':
-                return True
-            elif tag[1] == ':':
-                return True
-            else:
-                print('Element name should start with letter, unsderscore or colon: ',  tag)
+    for tag in get_all_tags_in_order():     #make sure that names starting with ? and ! pass through
+        if tag[1] != '?' and tag[1] != '!' and \
+            not tag[1].isalpha() and \
+            not tag[1] == '_' and \
+            not tag[1] == ':' and \
+            not tag[1] == '/':
+                print('Element name should start with letter, underscore or colon: ', tag)
                 return False
+    else:
+        return True
+
 
 
 # ****************************************************************************************************
@@ -268,7 +267,7 @@ def paired_elements_are_closed_properly_and_names_match():
     indices = []
     for i, tag in enumerate(l):
         if ' ' in tag and tag.startswith('</'):
-            print('Closing tag must not contain spaces.')
+            print('Closing tag must not contain spaces.', tag)
             return False
         if ' ' in tag and '/' not in tag:
             space_pos = tag.index(' ')
@@ -311,7 +310,7 @@ def paired_elements_are_closed_properly_and_names_match():
         mismatching_tag_name_cl[i] = name[0]+'/'+name[1:]
 
     if len(mismatching_tag_name_op) != 0:
-        print('The following opening tag names don\'t have a match: ', mismatching_tag_name_op)
+        print('The following opening tag names don\'t have a match: ', mismatching_tag_name_op) # check - always shows opening tag as without a match, even when closing one is problematic
         return False
     elif len(mismatching_tag_name_cl) != 0:
         print('The following closing tag names don\'t have a match: ', mismatching_tag_name_cl)
@@ -321,7 +320,7 @@ def paired_elements_are_closed_properly_and_names_match():
 
 
 # ****************************************************************************************************
-#   CHECK THAT TAGS ARE CASE SENSITIVE - NEEDS FIXING. REWRITE???
+#   CHECK THAT TAGS ARE CASE SENSITIVE - CURRENTLY WORKS FOR LOWERCASE
 # ****************************************************************************************************
 def all_lowercase_tags():
     """
@@ -329,7 +328,6 @@ def all_lowercase_tags():
     For now, ensure all tag names are lower case.
     :return: boolean
     """
-
     for tag in get_clean_tags():
         if not tag.islower():
             print('Incorrect tag name. Should be lower case: ', tag)
@@ -579,49 +577,83 @@ print('*************************************************************************
 # CHECKS
 # Main run:
 
-if number_of_angle_brackets_is_even():
-    #print('Number of angle brackets is even: ', number_of_angle_brackets_is_even())
-    if number_of_opening_and_closing_brackets_match():
-        #print('Numbers of opening and closing brackets match: ', number_of_opening_and_closing_brackets_match())
-        if no_duplicate_tags():
-            #print('No duplicate tags: ', no_duplicate_tags())
-            if starts_with_xml_declaration():
-                #print('Starts with xml declaration (or comment and then xml declar.)): ', starts_with_xml_declaration())
-                if root_tags_match():
-                    #print('Root element tags match: ', root_tags_match())
-                    if no_invalid_initial_characters_in_opening_tag():
-                        #print('No invalid initial characters in opening tag: ', no_invalid_initial_characters_in_opening_tag())
-                        if no_initial_space_in_opening_tags():
-                            #print('No initial space in opening tags: ', no_initial_space_in_opening_tags())
-                            if element_names_contain_only_valid_characters():
-                                #print('Element names contain only valid characters: ', element_names_contain_only_valid_characters())
-                                if closing_tag_incorrectly_formed():
-                                    #print('Closing tg starts correctly: ', closing_tag_incorrectly_formed())
-                                    if no_spaces_in_closing_tags():
-                                        #print('No spaces in closing tags:', no_spaces_in_closing_tags())
-                                        if paired_elements_are_closed_properly_and_names_match():
-                                            #print('Elements are closed properly: ', paired_elements_are_closed_properly_and_names_match())
-                                            if closing_tags_that_are_not_single_dont_have_attributes():
-                                                #print('Closing tags (not single) dont have attributes: ', closing_tags_that_are_not_single_dont_have_attributes())
-                                                if single_element_is_correctly_formed_case_without_attribute():
-                                                    # print('Single element is correctly formed (not considering attrib.): ', single_element_is_correctly_formed_case_without_attribute())
-                                                    if all_lowercase_tags():
-                                                        #print('All lowercase tags: ', all_lowercase_tags())
-                                                        if is_nesting_proper():
-                                                            #print('Is nesting proper: ', is_nesting_proper())
-                                                            if is_number_of_comment_tags_even():
-                                                                #print('Is number of comment tags even: ',  is_number_of_comment_tags_even())
-                                                                if is_comment_opening_tag_followed_by_closing_tag():
-                                                                    #print('Is opening tag for comments immediatelly followed by closing tag (means there is no nesting): ',
-                                                                     #     is_comment_opening_tag_followed_by_closing_tag())
-                                                                    if comment_closing_tags_dont_have_extra_dash():
-                                                                        #print('Comment closing tags dont have extra dash: ', comment_closing_tags_dont_have_extra_dash())
-                                                                            if no_restricted_characters_in_content():
-                                                                                #print('No restricted characters in content: ', no_restricted_characters_in_content())
-                                                                                if no_invalid_content_after_root_tag():
-                                                                                    #print('No invalid content before or after the root tag: ', no_invalid_content_before_and_after_root_tag())
-                                                                                    print('Document is well formed!')
+
+def run():
+    """
+    Function to invoke the program
+    :return: print statements: warnings and that file is well formed.
+    """
+    if number_of_angle_brackets_is_even():
+        #print('Number of angle brackets is even: ', number_of_angle_brackets_is_even())
+        if number_of_opening_and_closing_brackets_match():
+            #print('Numbers of opening and closing brackets match: ', number_of_opening_and_closing_brackets_match())
+            if no_duplicate_tags():
+                #print('No duplicate tags: ', no_duplicate_tags())
+                if starts_with_xml_declaration():
+                    #print('Starts with xml declaration (or comment and then xml declar.)): ', starts_with_xml_declaration())
+                    if root_tags_match():
+                        #print('Root element tags match: ', root_tags_match())
+                        if no_invalid_initial_characters_in_opening_tag():
+                            #print('No invalid initial characters in opening tag: ', no_invalid_initial_characters_in_opening_tag())
+                            if no_initial_space_in_opening_tags():
+                                #print('No initial space in opening tags: ', no_initial_space_in_opening_tags())
+                                if element_names_contain_only_valid_characters():
+                                    #print('Element names contain only valid characters: ', element_names_contain_only_valid_characters())
+                                    if closing_tag_incorrectly_formed():
+                                        #print('Closing tg starts correctly: ', closing_tag_incorrectly_formed())
+                                        if no_spaces_in_closing_tags():
+                                            #print('No spaces in closing tags:', no_spaces_in_closing_tags())
+                                            if paired_elements_are_closed_properly_and_names_match():
+                                                #print('Elements are closed properly: ', paired_elements_are_closed_properly_and_names_match())
+                                                if closing_tags_that_are_not_single_dont_have_attributes():
+                                                    #print('Closing tags (not single) dont have attributes: ', closing_tags_that_are_not_single_dont_have_attributes())
+                                                    if single_element_is_correctly_formed_case_without_attribute():
+                                                        # print('Single element is correctly formed (not considering attrib.): ', single_element_is_correctly_formed_case_without_attribute())
+                                                        if all_lowercase_tags():
+                                                            #print('All lowercase tags: ', all_lowercase_tags())
+                                                            if is_nesting_proper():
+                                                                #print('Is nesting proper: ', is_nesting_proper())
+                                                                if is_number_of_comment_tags_even():
+                                                                    #print('Is number of comment tags even: ',  is_number_of_comment_tags_even())
+                                                                    if is_comment_opening_tag_followed_by_closing_tag():
+                                                                        #print('Is opening tag for comments immediatelly followed by closing tag (means there is no nesting): ',
+                                                                         #     is_comment_opening_tag_followed_by_closing_tag())
+                                                                        if comment_closing_tags_dont_have_extra_dash():
+                                                                            #print('Comment closing tags dont have extra dash: ', comment_closing_tags_dont_have_extra_dash())
+                                                                                if no_restricted_characters_in_content():
+                                                                                    #print('No restricted characters in content: ', no_restricted_characters_in_content())
+                                                                                    if no_invalid_content_after_root_tag():
+                                                                                        #print('No invalid content before or after the root tag: ', no_invalid_content_before_and_after_root_tag())
+                                                                                        print('Document is well formed!')
+
+
+# run the program
+run()
 
 
 
 
+""" # SOME GUI HERE, NOT YET LINKED TO XML CHECKER
+#**********************************************************************************
+#    GUI
+#**********************************************************************************
+import sys
+from tkinter import *
+
+def gui():
+    mText = xml_text.get()
+    mLabel2 = Label(mGui, text = mText).pack()
+    return
+
+
+mGui = Tk()
+xml_text = StringVar()
+
+mGui.geometry('500x500')
+mGui.title('XML Well Formedness Checker')
+mLabel = Label(mGui, text = 'XML Well Formedness Checker').pack()
+mEntry = Entry(mGui, textvariable = xml_text).pack()
+mButton = Button(mGui, text = 'Check', command = gui, fg='yellow', bg='black').pack()
+
+mainloop()
+"""

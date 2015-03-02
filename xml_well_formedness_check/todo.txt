@@ -1,6 +1,7 @@
 TO DO:
     FIX functions:
-    - <aaa/> is incorrectly pickd up by single_element_is_correctly_formed() function
+    - bug: in get_clean_tags(). Doesn't work for tags that have spave after <.
+    split = [tag.split() for tag in no_slash]   # problem: if I split when tag has initial space, it doesn't work. Gives '' for < from >
     - check comments in all functions (including utilities) for bugs, problems
     - see what else is needed from the list (ignore attribs for now)
     - clean up docstrings

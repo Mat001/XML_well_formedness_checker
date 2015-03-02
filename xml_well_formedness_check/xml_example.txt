@@ -13,7 +13,7 @@
     </to>
     <!-- this a test xml file -->
     <br />
-    <heading>Reminder</heading>
+       <heading>Reminder</heading>
     <body id="">Don't forget me this weekend!
 </body>
 </note>
