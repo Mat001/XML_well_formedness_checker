@@ -632,28 +632,3 @@ run()
 
 
 
-
-""" # SOME GUI HERE, NOT YET LINKED TO XML CHECKER
-#**********************************************************************************
-#    GUI
-#**********************************************************************************
-import sys
-from tkinter import *
-
-def gui():
-    mText = xml_text.get()
-    mLabel2 = Label(mGui, text = mText).pack()
-    return
-
-
-mGui = Tk()
-xml_text = StringVar()
-
-mGui.geometry('500x500')
-mGui.title('XML Well Formedness Checker')
-mLabel = Label(mGui, text = 'XML Well Formedness Checker').pack()
-mEntry = Entry(mGui, textvariable = xml_text).pack()
-mButton = Button(mGui, text = 'Check', command = gui, fg='yellow', bg='black').pack()
-
-mainloop()
-"""
