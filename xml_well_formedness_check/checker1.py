@@ -197,7 +197,8 @@ def no_invalid_initial_characters_in_opening_tag():
 
     for tag in get_all_tags_in_order():
         for char in invalid_start_characters:
-            if tag[1] == char:
+            if tag[1:].startswith(char):         # BUG was here - first character can't have more than one character (xml, Xml, xMl, like list has)
+                                                 # now fixed. Needs to be tested
                 print('Tag with invalid start character: ', tag)
                 return False
 
