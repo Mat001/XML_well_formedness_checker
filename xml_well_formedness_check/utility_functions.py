@@ -111,7 +111,10 @@ def get_clean_tags():
             without_declarations_and_comments.remove(item)
             #print(without_declarations_and_comments)
 
-    no_slash = [tag.replace('/', '') for tag in without_declarations_and_comments]
+    # remove opening and closing forward slashes (but dont remove any slashes in the name itself!)
+    no_slash = [ tag.replace('</', '<') for tag in without_declarations_and_comments ]
+    no_slash = [tag.replace('/>', '>') for tag in no_slash]
+
     split = [tag.split() for tag in no_slash]   # problem: if I split when tag has initial space, it doesn't work. Gives '' for < from >
     first_part = [part[0] for part in split]
 

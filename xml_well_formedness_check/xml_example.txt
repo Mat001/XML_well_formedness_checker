@@ -2,17 +2,32 @@
 <!DOCTYPE greeting SYSTEM "hello.dtd">ddd
 <note &id=''>fff
     <to b = "111"><aaa  />
-    <aaa/>
-    <!-- this a test xml file -->
-        <firstname b="12">Tov%e</firstname>
-        <lastname a= " sds">Brown John</lastname>
-    <from >
-    <br />
-    <!-- -->
-    Jani</from>
+        <aaa/>
+        <!-- this a test xml file -->
+            <firstname b="12">Tov%e</firstname>
+            <lastname a= " sds">Brown John</lastname>
+        <fro_)*m>
+            <br />
+            <!-- -->
+            Jani
+        </from>
+        <from >
+            Matjaz
+        </from><war/><sss/>
     </to>
     <!-- this a test xml file -->
     <br />
+    <from/>
+        test
+        <from>category1 | category2 | category3</from>
+        <a1><img>
+            <a2>
+                <from >haha
+                    <from>uuu</from>
+                </from>
+            </a2></img>
+        </a1>
+
        <heading>Reminder</heading>
     <body id="">Don't forget me this weekend!
 </body>

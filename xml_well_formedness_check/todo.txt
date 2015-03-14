@@ -1,7 +1,38 @@
 TO DO:
     FIX functions:
-    - bug: in get_clean_tags(). Doesn't work for tags that have spave after <.
-    split = [tag.split() for tag in no_slash]   # problem: if I split when tag has initial space, it doesn't work. Gives '' for < from >
+    - bug: in get_clean_tags(). Doesn't work for tags that have space after <.
+    split = [tag.split() for tag in no_slash]   # problem: if I split when tag has initial space, it doesn't work.
+    Gives '' for < from >  - IS THIS REALLY A PROBLEM? INITIAL SPACE GETS REMOVED BY FUNCT no_initial_space_in_tag_names()
+
+    - program works only when functions in a long if statement. If no if statement, then functions return duplicate results
+    because same checks are used in different functions. Benefit is that all errors are shown in one list (nice!) versus
+    error by error. Is it worth it? Is eliminating duplicates doable without breaking the rest? If I do that, will I still
+    need to put functions in order?
+     Remember there is dependency in some functions like get_all_tags_in_order that ALL ANGLE BRACKETS ARE PRESENT, and no extra ones.
+     So the function that checks for all angle brackets must pass before get_all_angle_brackets.
+     Check if there are any other dependencies like this one!!
+
+    - if I add <img ><img> to the xml file, the warning says The following opening tag names don't have a match:  ['<img>']
+    Why only the second tag name??? Should list both opening tags. - NOT A HUGE ISSUE
+
+OK    - Can element names be the same? Let's say several book elements in a list of books? NOW FIXED - removed fuction to check for duplicate tags.
+    DOESN'T ACCEPT DUPLICATE TAGS! It should! For example list of books:
+    <books1>
+        <book>
+            title1
+        </book>
+        <book>
+            title2
+        </book>
+    <books1>
+OK    - Single element </wer/> is not picked up as an error. - NOW FIXED - func no_invalid_initial_characters_in_opening_tag() addresses it
+OK    - check_that_element_names_contain_only_valid_characters() doesn't pick up extra '/' as invalid element: <abc//> or </a/bc>
+        The reason is that get_clean_tags() removes all '/', even those that are not at the ends.
+        Change get_clean_tags() so it picks up those '/' that are in between? (make sure that you don't break the rest of the code!! - this is where regression testing is helpful))
+        
+
+
+
     - check comments in all functions (including utilities) for bugs, problems
     - see what else is needed from the list (ignore attribs for now)
     - clean up docstrings

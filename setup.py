@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='xml_well_formedness_check',
-    version='1.0',
+    version='1.0.1',
     packages=['xml_well_formedness_check', 'docs'],
 
     # metadata
