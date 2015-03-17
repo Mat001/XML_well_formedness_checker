@@ -6,6 +6,30 @@ They provide helpful functionality but don't perform direct checking of the xml 
 import logging
 import sys
 
+
+# ****************************************************************************************************
+#   GET LINE NUMBERS OF XML FILE - utility function
+# ****************************************************************************************************
+def get_line_numbers():
+    """
+    Get line numbers for each line of XML file
+    Function counts empty lines too and that is fine (OttoTag does that too).
+    :return: list of tuple pairs: line number, line
+    """
+    logging.basicConfig(level=logging.DEBUG)
+
+    try:
+        with open('/home/matjaz/PycharmProjects/xml_well_formedness_check/'
+                  'xml_well_formedness_check/xml_example.txt', 'r') as f:
+            # get line numbers
+            line_numbers = [ (num, line) for num, line in enumerate(f) ]
+            return line_numbers
+
+    except IOError as e:
+        logging.error(e)
+        logging.error(sys.exc_info())
+
+
 # ****************************************************************************************************
 #   GET XML STRING -READ FROM FILE - utility function
 # ****************************************************************************************************
@@ -99,7 +123,7 @@ def get_clean_tags():
     """
     # get all tags and clean them up
     without_declarations_and_comments = get_all_tags_in_order()
-
+    #print('get all atg in order: ', get_all_tags_in_order())
     for item in get_all_tags_in_order():
         #if '-->' in item:         # CAN't FIND AND REMOVE IT!' # ????  --\\> DOES SOMETHING?
          #   without_declarations_and_comments.remove(item)
@@ -116,8 +140,9 @@ def get_clean_tags():
     no_slash = [tag.replace('/>', '>') for tag in no_slash]
 
     split = [tag.split() for tag in no_slash]   # problem: if I split when tag has initial space, it doesn't work. Gives '' for < from >
+    #print('split: ', split)
     first_part = [part[0] for part in split]
-
+    #print('first_part: ', first_part)
     clean = []
     for tag in first_part:
         tag = tag.strip('<')

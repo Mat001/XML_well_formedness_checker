@@ -1,8 +1,27 @@
 TO DO:
     FIX functions:
-    - bug: in get_clean_tags(). Doesn't work for tags that have space after <.
+    - BUG: in get_clean_tags(). Doesn't work for tags that have space after <.
     split = [tag.split() for tag in no_slash]   # problem: if I split when tag has initial space, it doesn't work.
     Gives '' for < from >  - IS THIS REALLY A PROBLEM? INITIAL SPACE GETS REMOVED BY FUNCT no_initial_space_in_tag_names()
+
+OK  - BUG: if tag has extra > at the end it throws error - FIXED - first two functions solve it
+    File "/home/matjaz/PycharmProjects/xml_well_formedness_check/xml_well_formedness_check/utility_functions.py", line 119, in get_clean_tags
+    first_part = [part[0] for part in split]
+    IndexError: list index out of range
+    for example <from>>
+
+    - HOW TO ADD LINE NUMBER TO WARNINGS for no of tags not even, tags don't match?
+        - first option: function even tags has exception that allows further funcion checks until the point where linenumber can be pinpointed.
+        The problem with this is that get_all_tags_in_order() requires even and matching brackets.
+        So either fix get_all_tags_in_order so it doesn't have to rely on even and matching brackets or
+        fix functions even brackets, matching brackets to show line numbers.
+        - second: apply errorLog class and see if you can use line numbers there
+        COMMENT: TWO OPENING or CLOSING BRACKETS CAN't BE ONE RIGHT AFTER THE OTHER?
+
+   (- BUG? CHECK if stack symetry approach algorithm for nesting works if not all tags have their pairs - I'm trying if same
+     stack algo works to find extra unmatching brackets. Maybe algo works ONLY when yuo have paired tags and ONLY look for nesting,
+     not for extra tags!)
+
 
     - program works only when functions in a long if statement. If no if statement, then functions return duplicate results
     because same checks are used in different functions. Benefit is that all errors are shown in one list (nice!) versus
