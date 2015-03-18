@@ -24,23 +24,38 @@ import re
 def no_orphan_brackets():
     """
     Check that there are no orphan, single, obsolte, extra brackets.
-    Eack opening bracket should have a closing pair (<,>).
+    Each opening bracket should have a closing pair (<,>).
     Function checks that no two or more consecutive opening or closing brackets exist (<,< is incorrect).
     - every > must have < as the next bracket
     - every < must have > as the previous bracket
     - find places where these two rules are violated
     :return: boolean
     """
-    # get ordered list of all brackets
-    brackets = [i for i in getstring() if i == '<' or i == '>']
+    # get ordered list of all indexed brackets
+    brackets = [ (ind, i) for ind, i in enumerate(getstring()) if i == '<' or i == '>']
+    #print(brackets)
 
-    # get line numbers
-    print(get_line_numbers()) # -- USE THIS TO ATTRIBUTE A LINE NUMBER TO THE ORPHAN TAG
+    # get list of lengths of each line
+    line_lenghts = [ len(line[1]) for line in get_line_numbers() ]
+
+    # get list of lengths of each line in growing fashion. Each length is a sum of previous lengths.
+    # this is to have intervals in which we look for bracket position
+    increasing_line_lengths=[0] # Needs to start at zero!
+    s=0
+    for i in line_lenghts:
+        s += i
+        increasing_line_lengths.append(s)
+    #print('Increasing line lengths: ', increasing_line_lengths)
 
     # implement "sliding window" technique, that is compare two consecutive brackets. They should not be the same.
     for i, bracket in enumerate(brackets[:-1]):
-        if brackets[i+1] == bracket:
-            print('Document has extra-orphan bracket(s). ', 'Number of the bracket:', i, bracket)
+        if brackets[i+1][1] == bracket[1]:
+            # find interval in which bracket falls
+            for ind, brack in enumerate(increasing_line_lengths[:-1]):
+                if bracket[0] >= brack and bracket[0] < increasing_line_lengths[ind + 1]:
+                    number, content = get_line_numbers()[ind]  # tuple unpacking of line number and the line content
+                    print('Document has extra-orphan bracket(s) on line number ' + str(number) + ': ' + content)
+
             return False
     return True
 
@@ -101,6 +116,8 @@ def no_duplicate_tags():
     """
     Check for exactly identical tags. Should never occur, except for comments and single elements.
     Paired elements need closing tag.
+    REVISION: NOT TRUE. TAGS CAN REPEAT. EXAMPLE: many books in a library <book></book>
+    THIS FUNCTION HAS BEEN UNCOMMENTED WHERE IT'S CALLED.
     :return: boolean
     """
 
@@ -176,7 +193,11 @@ def no_initial_space_in_opening_tags():
     """
     for tag in get_all_tags_in_order():
         if tag[1] == ' ':
-            print('Space immediatelly after \'<\' not allowed.', tag)
+            for i in get_line_numbers():
+                if tag in i[1]:
+                    print('Space immediatelly after \'<\' not allowed.')
+                    print('Line number ' + str(i[0]) + ': ' + i[1])     # display line. Could display just the tag.
+                                                                        # But to be consistent, the whole affected line is displayed.
             return False
     return True
 

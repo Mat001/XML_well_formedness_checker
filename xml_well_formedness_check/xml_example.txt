@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>bbb
-
-
-
-
-
-
 <!DOCTYPE greeting SYSTEM "hello.dtd">ddd
-
 <note &id=''>fff
     <to b = "111"><aaa  />
         <aaa/>
@@ -29,7 +22,7 @@
         <from>category1 | category2 | category3</from>
         <a1><img>
             <a2>
-                <from >haha
+                <from >
                     <from>uuu</from>
                 </from>
             </a2></img>

@@ -51,6 +51,10 @@ OK    - check_that_element_names_contain_only_valid_characters() doesn't pick up
         
 
 
+    - test well funciton no_orphan_brackets(), especially part: if brackets[i+1] == bracket (must not produce index out of range error)
+    - BUG: no_orphan_brackets():
+        - prints previous full line when orphan bracket is on empty line
+        - doesn't pick up opening orphan bracket after the end of end root tag. It does pick up closing bracket.
 
     - check comments in all functions (including utilities) for bugs, problems
     - see what else is needed from the list (ignore attribs for now)
