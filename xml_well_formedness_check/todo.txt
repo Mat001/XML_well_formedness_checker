@@ -4,12 +4,6 @@ TO DO:
     split = [tag.split() for tag in no_slash]   # problem: if I split when tag has initial space, it doesn't work.
     Gives '' for < from >  - IS THIS REALLY A PROBLEM? INITIAL SPACE GETS REMOVED BY FUNCT no_initial_space_in_tag_names()
 
-OK  - BUG: if tag has extra > at the end it throws error - FIXED - first two functions solve it
-    File "/home/matjaz/PycharmProjects/xml_well_formedness_check/xml_well_formedness_check/utility_functions.py", line 119, in get_clean_tags
-    first_part = [part[0] for part in split]
-    IndexError: list index out of range
-    for example <from>>
-
     - HOW TO ADD LINE NUMBER TO WARNINGS for no of tags not even, tags don't match?
         - first option: function even tags has exception that allows further funcion checks until the point where linenumber can be pinpointed.
         The problem with this is that get_all_tags_in_order() requires even and matching brackets.
@@ -18,9 +12,26 @@ OK  - BUG: if tag has extra > at the end it throws error - FIXED - first two fun
         - second: apply errorLog class and see if you can use line numbers there
         COMMENT: TWO OPENING or CLOSING BRACKETS CAN't BE ONE RIGHT AFTER THE OTHER?
 
-   (- BUG? CHECK if stack symetry approach algorithm for nesting works if not all tags have their pairs - I'm trying if same
-     stack algo works to find extra unmatching brackets. Maybe algo works ONLY when yuo have paired tags and ONLY look for nesting,
-     not for extra tags!)
+   - BUG: no_orphan_brackets():
+        - prints previous full line when orphan bracket is on empty line
+        - doesn't pick up opening orphan bracket after the end of end root tag. It does pick up closing bracket.
+
+    - BUG (SEVERE): not recognizing nesting
+    Doesn't pick up two consecutive <img><img> tags or </img></img>.
+    Seems the bug comes up when even number of tags but have opening or both have closing tag.
+    Snippet from within the root element:
+
+    </img><img>         <--- DOESNT PICK UP !!!!!!
+    <from>category1 | category2 | category3</from>
+    <a1></img></img>    <---- DOESNT PICK UP !!!!!
+        <img>
+            <a2>
+                <from >
+                    <from>uuu</from>
+                </from>
+            </a2>
+        <img>       <----- DOESNT PICK UP MISSING CLOSING TAG
+    </a1>
 
 
     - program works only when functions in a long if statement. If no if statement, then functions return duplicate results
@@ -48,14 +59,15 @@ OK    - Single element </wer/> is not picked up as an error. - NOW FIXED - func 
 OK    - check_that_element_names_contain_only_valid_characters() doesn't pick up extra '/' as invalid element: <abc//> or </a/bc>
         The reason is that get_clean_tags() removes all '/', even those that are not at the ends.
         Change get_clean_tags() so it picks up those '/' that are in between? (make sure that you don't break the rest of the code!! - this is where regression testing is helpful))
-        
+
+OK  - BUG: if tag has extra > at the end it throws error - FIXED - first two functions solve it
+    File "/home/matjaz/PycharmProjects/xml_well_formedness_check/xml_well_formedness_check/utility_functions.py", line 119, in get_clean_tags
+    first_part = [part[0] for part in split]
+    IndexError: list index out of range
+    for example <from>>
 
 
     - test well funciton no_orphan_brackets(), especially part: if brackets[i+1] == bracket (must not produce index out of range error)
-    - BUG: no_orphan_brackets():
-        - prints previous full line when orphan bracket is on empty line
-        - doesn't pick up opening orphan bracket after the end of end root tag. It does pick up closing bracket.
-
     - check comments in all functions (including utilities) for bugs, problems
     - see what else is needed from the list (ignore attribs for now)
     - clean up docstrings

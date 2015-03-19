@@ -19,14 +19,17 @@
     <br />
     <from/>
         test
-        <from>category1 | category2 | category3</from>
-        <a1><img>
+    </img><img>
+    <from>category1 | category2 | category3</from>
+    <a1></img></img>
+        <img>
             <a2>
                 <from >
                     <from>uuu</from>
                 </from>
-            </a2></img>
-        </a1>
+            </a2>
+        <img>
+    </a1>
 
        <heading>Reminder</heading>
     <body id="">Don't forget me this weekend!
