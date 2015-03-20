@@ -125,26 +125,32 @@ def get_clean_tags():
     without_declarations_and_comments = get_all_tags_in_order()
     #print('get all atg in order: ', get_all_tags_in_order())
     for item in get_all_tags_in_order():
-        #if '-->' in item:         # CAN't FIND AND REMOVE IT!' # ????  --\\> DOES SOMETHING?
-         #   without_declarations_and_comments.remove(item)
-          #  print('STSTSTST ', without_declarations_and_comments)
+        #  print('STSTSTST ', without_declarations_and_comments)
+        if '<?' in item:
+            without_declarations_and_comments.remove(item)
+            # print(without_declarations_and_comments)
         if '<!' in item:
             without_declarations_and_comments.remove(item)
             #print(without_declarations_and_comments)
-        if '<?' in item:
-            without_declarations_and_comments.remove(item)
-            #print(without_declarations_and_comments)
+
 
     # remove opening and closing forward slashes (but dont remove any slashes in the name itself!)
     no_slash = [ tag.replace('</', '<') for tag in without_declarations_and_comments ]
     no_slash = [tag.replace('/>', '>') for tag in no_slash]
+    #print('no_slash: ', no_slash)
 
-    split = [tag.split() for tag in no_slash]   # problem: if I split when tag has initial space, it doesn't work. Gives '' for < from >
+    split = [ tag.split() for tag in no_slash ]
     #print('split: ', split)
-    first_part = [part[0] for part in split]
-    #print('first_part: ', first_part)
+
+    tags = []
+    for part in split:
+        if not part[0] == '<':
+            tags.append(part[0])
+        elif part[0] == '<':
+            tags.append(part[1])
+
     clean = []
-    for tag in first_part:
+    for tag in tags:
         tag = tag.strip('<')
         tag = tag.strip('>')
         clean.append(tag)

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>bbb
 <!DOCTYPE greeting SYSTEM "hello.dtd">ddd
 <note &id=''>fff
+    <!-- hahaha -->
     <to b = "111"><aaa  />
         <aaa/>
         <!-- this a test xml file -->
@@ -8,7 +9,7 @@
             <lastname a= " sds">Brown John</lastname>
         <from> hjhj
             <br />
-            <!-- -->
+            <!--  -->
             Jani
         </from>
         <from >
@@ -19,16 +20,16 @@
     <br />
     <from/>
         test
-    </img><img>
+    <img><img>
     <from>category1 | category2 | category3</from>
-    <a1></img></img>
+    <a1>
         <img>
             <a2>
                 <from >
-                    <from>uuu</from>
+                    <from>uu< ></from>
                 </from>
             </a2>
-        <img>
+        </img>
     </a1>
 
        <heading>Reminder</heading>

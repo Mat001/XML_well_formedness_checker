@@ -1,8 +1,8 @@
 TO DO:
     FIX functions:
-    - BUG: in get_clean_tags(). Doesn't work for tags that have space after <.
-    split = [tag.split() for tag in no_slash]   # problem: if I split when tag has initial space, it doesn't work.
-    Gives '' for < from >  - IS THIS REALLY A PROBLEM? INITIAL SPACE GETS REMOVED BY FUNCT no_initial_space_in_tag_names()
+
+    - BUG: No_orphan_brackets()
+      doesn't pick up: << aaa/>>><, <>< aaa/>> - NOW SEEMS TO WORK BETTER. NO MORE ERROR MESSAGES.
 
     - HOW TO ADD LINE NUMBER TO WARNINGS for no of tags not even, tags don't match?
         - first option: function even tags has exception that allows further funcion checks until the point where linenumber can be pinpointed.
@@ -13,7 +13,11 @@ TO DO:
         COMMENT: TWO OPENING or CLOSING BRACKETS CAN't BE ONE RIGHT AFTER THE OTHER?
 
    - BUG: no_orphan_brackets():
-        - prints previous full line when orphan bracket is on empty line
+        - It shows previous line number 1 for bracket on line 3. For example:
+        1 <aaa>
+        2
+        3 ><bbb>
+        4 <ccc>
         - doesn't pick up opening orphan bracket after the end of end root tag. It does pick up closing bracket.
 
     - BUG (SEVERE): not recognizing nesting
@@ -32,6 +36,15 @@ TO DO:
             </a2>
         <img>       <----- DOESNT PICK UP MISSING CLOSING TAG
     </a1>
+    Does nesting function work only for element names, but doesn't check if tag is opening of closing?
+    Make sure that there is a check that checks whether </img><img> is in incorrect order (while checking
+    for nesting or as separete check) - should function paired_elements_are_closed_properly_and_names_match do that ()?
+
+OK? - BUG: doesn't recognize <> as invalid characters as data content (invalid chars are <, >, &).
+    Neither orphan brackets function works - because <> is considered an empty tag (all three initial checks in
+    run() function are satisfied: no_orphan_brackets, number of brackets is even, number of opening and closing brackets match).
+    So what is the check then for an empty tag <> ? NOW FIXED IN LOWERCASE FUNCTION. CHECKS FO EMPTY TAG.
+    AS SOON AS THERE A SINGLE TAG, ORPHAN FUNCTION PICKS IT UP.
 
 
     - program works only when functions in a long if statement. If no if statement, then functions return duplicate results
@@ -44,6 +57,13 @@ TO DO:
 
     - if I add <img ><img> to the xml file, the warning says The following opening tag names don't have a match:  ['<img>']
     Why only the second tag name??? Should list both opening tags. - NOT A HUGE ISSUE
+
+
+
+
+OK    - BUG: in get_clean_tags(). Doesn't work for tags that have space after <.
+    split = [tag.split() for tag in no_slash]   # problem: if I split when tag has initial space, it doesn't work.
+    Gives '' for < from >
 
 OK    - Can element names be the same? Let's say several book elements in a list of books? NOW FIXED - removed fuction to check for duplicate tags.
     DOESN'T ACCEPT DUPLICATE TAGS! It should! For example list of books:
