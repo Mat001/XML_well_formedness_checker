@@ -1,8 +1,14 @@
 TO DO:
     FIX functions:
 
-    - BUG: No_orphan_brackets()
-      doesn't pick up: << aaa/>>><, <>< aaa/>> - NOW SEEMS TO WORK BETTER. NO MORE ERROR MESSAGES.
+    - IMPORTANT:
+    HOW TO PASS getstring(), get_all_tags_in_order(), get_line_numbers(), get_clean_tags() as parameter or class object?
+    These functions should not be spread all over the code. INstead they should be passed as parameter to functions. Or as a class object -
+    but find out how and which method is better.
+    IMPORTANT: IN utility functions getstring() is used in several other untility functions which are in turn called in
+    main module checker1.py. That means there is parameter nesting. This is not good.
+    Try remove utility functions to use each other. That possible?
+    Or is there a way to use class/objects to get rid of this duplication/coupling?
 
     - HOW TO ADD LINE NUMBER TO WARNINGS for no of tags not even, tags don't match?
         - first option: function even tags has exception that allows further funcion checks until the point where linenumber can be pinpointed.
@@ -48,6 +54,9 @@ TO DO:
     - if I add <img ><img> to the xml file, the warning says The following opening tag names don't have a match:  ['<img>']
     Why only the second tag name??? Should list both opening tags. - NOT A HUGE ISSUE
 
+
+OK    - BUG: No_orphan_brackets()
+      doesn't pick up: << aaa/>>><, <>< aaa/>>
 
 OK   - BUG: no_redundant_brackets():
         - It shows previous line number 1 for bracket on line 3. For example:

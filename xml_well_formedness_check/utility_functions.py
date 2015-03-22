@@ -277,29 +277,3 @@ def get_number_of_all_tags_excluding_declar_doctype_comments():
             #print(without_declarations_and_comments)
 
     return len(without_declarations_and_comments)
-
-
-# ****************************************************************************************************
-#   FIND DUPLICATE TAGS - utility function
-# ****************************************************************************************************
-def find_duplicate_tags():
-    """
-    Find duplicate tags.
-    :return: list of duplicate tags
-    """
-    without_declarations_and_comments = get_all_tags_in_order()
-
-    for item in get_all_tags_in_order():
-        if '<!' in item:
-            without_declarations_and_comments.remove(item)
-            # print(without_declarations_and_comments)
-        if '<?' in item:
-            without_declarations_and_comments.remove(item)
-            # print(without_declarations_and_comments)
-
-    without_singles = [tag for tag in without_declarations_and_comments if '/>' not in tag]
-
-    duplicates = set([tag for tag in without_singles if without_singles.count(tag) > 1])
-    duplicates = list(duplicates)
-
-    return duplicates

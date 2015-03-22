@@ -1,7 +1,7 @@
 """
     This project is a non-validating XML parser that checks well-formedness of XML files.
     author: Matjaz Pirnovar
-    date: Feb 2015
+    date: Feb-Mar 2015
 
     PLAYING WITH REMOVING NESTED IF STATEMENTS IN run() FUNCTION.
     REVERT BACK TO NESTED IF TOO COMPLICATED.
@@ -40,7 +40,7 @@ err = ErrorLog()
 #   CHECK THAT DOCUMENT DOESN'T HAVE EXTRA-ORPHAN BRACKETS
 # ****************************************************************************************************
 
-def no_redundant_brackets(err):
+def no_redundant_brackets(err, xmlstr, linenum):
     """
     Check that there are no orphan, single, obsolete, extra brackets.
     Each opening bracket should have a closing pair (<,>).
@@ -58,7 +58,7 @@ def no_redundant_brackets(err):
     """
     # get line numbers for all the brackets
     brackets_line_numbers = []
-    for tup in get_line_numbers():
+    for tup in linenum:
         for char in tup[1]:
             if char == '<' or char == '>':
                 #print(tup[0], char)
@@ -75,13 +75,13 @@ def no_redundant_brackets(err):
         # Function returns incorrect line number of erroneous bracket if above is ignored.
         if br[1] == '<' and brackets_line_numbers[ind+1][1] == '<':
             op = br[0]
-            line_num, content = get_line_numbers()[op-1] # -1, just indicates appropriate start of counting
+            line_num, content = linenum[op-1] # -1, just indicates appropriate start of counting
             err.add_msg('no_redundant_brackets',
                         'Redundant bracket(s) or nested empty brackets on line ' + str(line_num) + ': ' + content.lstrip())
             return False
         if br[1] == '>' and brackets_line_numbers[ind+1][1] == '>':
             cl = brackets_line_numbers[ind+1][0]
-            line_num, content = get_line_numbers()[cl-1] # -1, just indicates appropriate start of counting
+            line_num, content = linenum[cl-1] # -1, just indicates appropriate start of counting
             err.add_msg('no_redundant_brackets',
                         'Redundant closing bracket(s) or empty nested brackets on line ' + str(line_num) + ': ' + content.lstrip())
             return False
@@ -90,7 +90,7 @@ def no_redundant_brackets(err):
     # check for empty tags
 
     # get all brackets with indexes
-    count_br = [ (count, br) for count, br in enumerate(getstring()) if br == '<' or br == '>' ]
+    count_br = [ (count, br) for count, br in enumerate(xmlstr) if br == '<' or br == '>' ]
     #print(count_br)
 
     zipped = zip(brackets_line_numbers, count_br)
@@ -103,10 +103,10 @@ def no_redundant_brackets(err):
 
     for ind, br in enumerate(l[:-1]):
         # variables
-        space_between_brackets = getstring()[br[1] + 1: l[ind + 1][1]]
+        space_between_brackets = xmlstr[br[1] + 1: l[ind + 1][1]]
         start_line = br[0]
         ending_line = l[ind + 1][0]
-        start_line_content = get_line_numbers()[start_line - 1][1]
+        start_line_content = linenum[start_line - 1][1]
 
         # if statements
         if space_between_brackets.isspace() and '\n' in space_between_brackets \
@@ -130,14 +130,14 @@ def no_redundant_brackets(err):
 #   CHECK THAT NUMBER OF < and > IS EVEN
 # ****************************************************************************************************
 
-def number_of_angle_brackets_is_even(err):
+def number_of_angle_brackets_is_even(err, xmlstr):
     """
     Check that number of angle brackets (<,>) is even.
     PS: Not a full test of matching brackets! For example even number of closing brackets
     could be missing or be added and the number would still be even.
     :return: sum of all angle brackets (as length of the list)
     """
-    number_of_all_angle_brackets = len([char for char in getstring() if char == '<' or char == '>'])
+    number_of_all_angle_brackets = len([char for char in xmlstr if char == '<' or char == '>'])
     if number_of_all_angle_brackets % 2 != 0:
         err.add_msg('number_of_angle_brackets_is_even', 'No of angle brackets is not even (' + str(number_of_all_angle_brackets) + ') '
                                                         'Check that brackets correctly surround tags.')
@@ -150,13 +150,13 @@ def number_of_angle_brackets_is_even(err):
 #   CHECK THAT NUMBERS OF < and > MATCH
 # ****************************************************************************************************
 
-def number_of_opening_and_closing_brackets_match(err):
+def number_of_opening_and_closing_brackets_match(err, xmlstr):
     """
     Get number of opening and closing brackets and compare if the number matches.
     :return: boolean
     """
-    open = getstring().count('<')
-    clos = getstring().count('>')
+    open = xmlstr.count('<')
+    clos = xmlstr.count('>')
 
     if open > clos:
         err.add_msg('number_of_opening_and_closing_brackets_match', 'Numbers of opening and closing brackets don\'t match. '
@@ -172,29 +172,9 @@ def number_of_opening_and_closing_brackets_match(err):
 
 
 # ****************************************************************************************************
-#   CHECK THERE ARE NO IDENTICAL TAGS (except comments and single elements)
-# ****************************************************************************************************
-''' # FUNCTION REDUNDANT. DUPLICATE TAGS ARE PART OF XML
-def no_duplicate_tags(err):
-    """
-    Check for exactly identical tags. Should never occur, except for comments and single elements.
-    Paired elements need closing tag.
-    REVISION: NOT TRUE. TAGS CAN REPEAT. EXAMPLE: many books in a library <book></book>
-    THIS FUNCTION HAS BEEN UNCOMMENTED WHERE IT'S CALLED.
-    :return: boolean
-    """
-
-    if len(find_duplicate_tags()) != 0:
-        err.add_msg('no_duplicate_tags', 'Duplicate tags found: ' + find_duplicate_tags())
-        return False
-    else:
-        return True
-'''
-
-# ****************************************************************************************************
 #   CHECK THAT FILE STARTS WITH XML DECLARATION
 # ****************************************************************************************************
-def starts_with_xml_declaration(err):
+def starts_with_xml_declaration(err, xmlstr):
     """
     Check that file starts with xml declaration
     :return: boolean
@@ -202,7 +182,7 @@ def starts_with_xml_declaration(err):
     xml='<?xml'
 
     # Starts with xml declaration
-    if getstring().startswith(xml):
+    if xmlstr.startswith(xml):
         return True
     else:
         err.add_msg('starts_with_xml_declaration', 'XML file does not start with XML declaration.')
@@ -243,38 +223,16 @@ def root_tags_match(err):
     else:
         return True
 
-'''
-# ****************************************************************************************************
-#   CHECK THAT THERE IS NO SPACE BETWEEN AN OPENING BRACKET AND THE NAME OPENING TAGS
-# ****************************************************************************************************
-# ALREADY CHECKED BY FUNCTION NO INVALID INITIAL CHARACTERS IN OPENING TAG - DELETE?
-def no_initial_space_in_opening_tags(err):
-    """
-    Check there is no space between opening bracket and the name in opening tags
-    :return: boolean
-    """
-    for tag in get_all_tags_in_order():
-        if tag[1] == ' ':
-            for i in get_line_numbers():
-                if tag in i[1]:
-                    # display line. Could display just the tag.
-                    # But to be consistent, the whole affected line is displayed.
-                    err.add_msg('no_initial_space_in_opening_tags', 'Space immediatelly after \'<\' not allowed. '
-                                                                    'Line ' + str(i[0]) + ': ' + i[1])
-
-            return False
-    return True
-'''
 
 # ****************************************************************************************************
 #   CHECK THAT THERE NO SPACE IN CLOSING TAGS
 # ****************************************************************************************************
-def no_spaces_or_attributes_in_closing_tags(err):
+def no_spaces_or_attributes_in_closing_tags(err, tags_order):
     """
     Check that closing tags don't have spaces. INCLUDE SINGLE EMPTY TAGS!!!
     :return: boolean
     """
-    for tag in get_all_tags_in_order():
+    for tag in tags_order:
         if tag[1] == '/' and ' ' in tag[1:]:
             err.add_msg('no_spaces_or_attributes_in_closing_tags', 'Closing tag must not have spaces or attributes: ' + tag)
             return False
@@ -308,7 +266,7 @@ def closing_tag_must_start_with_forward_slash(err):
 # ****************************************************************************************************
 #   CHECK FOR INVALID CHARACTERS AT THE BEGINNING OF TAG NAME
 # ****************************************************************************************************
-def no_invalid_initial_characters_in_opening_tag(err):
+def no_invalid_initial_characters_in_opening_tag(err, tags_order):
     """
     Element names must not start with digits, diacritics, the full stop, the hyphen and 'xml' (any letter case).
     Element names must start with letter (uppercase or lowercase), underscore, or colon.
@@ -321,7 +279,7 @@ def no_invalid_initial_characters_in_opening_tag(err):
     invalid_start_characters = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ,
                                 '.', '-', 'xml', 'XML', 'Xml', 'xMl', 'xmL', 'XMl', 'xML', ' ']
 
-    for tag in get_all_tags_in_order():
+    for tag in tags_order:
         for char in invalid_start_characters:
             if tag[1:].startswith(char):
                 err.add_msg('no_invalid_initial_characters_in_opening_tag',
@@ -331,7 +289,7 @@ def no_invalid_initial_characters_in_opening_tag(err):
 
     # Valid start characters
     # Check that element names DO start with letter (uppercase or lowercase), underscore, or colon.
-    for tag in get_all_tags_in_order():     #make sure that names starting with ? and ! pass through
+    for tag in tags_order:     #make sure that names starting with ? and ! pass through
         if tag[1] != '?' and tag[1] != '!' and \
             not tag[1].isalpha() and \
             not tag[1] == '_' and \
@@ -367,10 +325,6 @@ def element_names_contain_only_valid_characters(err):
     - Doesn't check for initial space in name (already covered)
     :return: boolean
     """
-    # REMOVING DUPLICATE - EXTRA SAFETY CHECK - safety check now done in run function where brackets are checked first
-    #if no_invalid_initial_characters_in_opening_tag(err) and no_initial_space_in_opening_tags(err):
-    #    names = set(get_clean_tags())
-
     names = set(get_clean_tags())
     # if anything else but letters, digits, hyphens, underscores, colons or full stops in names return false
     #p = re.compile('[ A-Za-z0-9_:.-]*$')
@@ -380,11 +334,6 @@ def element_names_contain_only_valid_characters(err):
                         'Element name contains invalid character(s) - allowed are letters, digits, _, :, ., - : ' + name)
             return False
     return True
-
-    #else:
-    #    err.add_msg('element_names_contain_only_valid_characters',
-    #                'Invalid initial character or disallowed initial space in opening tag.')
-    #    return False
 
 
 # ****************************************************************************************************
@@ -485,13 +434,13 @@ def paired_elements_are_closed_properly_and_names_match(err):
 # ****************************************************************************************************
 #   CHECK THAT TAGS ARE CASE SENSITIVE - CURRENTLY WORKS FOR LOWERCASE
 # ****************************************************************************************************
-def all_lowercase_tags(err):
+def all_lowercase_tags(err, tags_order):
     """
     Check that tags are case sensitive.
     For now, ensure all tag names are lower case.
     :return: boolean
     """
-    for tag in get_all_tags_in_order():
+    for tag in tags_order:
         if tag == '<>' or tag[1:-1].isspace():
             err.add_msg('all_lower_case', 'Found empty tag: ' + tag)
             return False
@@ -502,7 +451,7 @@ def all_lowercase_tags(err):
 
 
 # ****************************************************************************************************
-#   CHECK THAT NESTING IS PROPER - DONE!
+#   CHECK THAT NESTING IS PROPER
 # ****************************************************************************************************
 def is_nesting_proper(err):
     """
@@ -601,12 +550,12 @@ def is_comment_opening_tag_followed_by_closing_tag(err):
 # ****************************************************************************************************
 #   CHECK THAT COMMENT CLOSING TAGS DONT HAVE EXTRA DASH (--->)
 # ****************************************************************************************************
-def comment_closing_tags_dont_have_extra_dash(err):
+def comment_closing_tags_dont_have_extra_dash(err, xmlstr):
     """
     Check that comment closing tags don't have extra dash (--->).
     :return: boolean
     """
-    if '--->' in getstring():
+    if '--->' in xmlstr:
         err.add_msg('comment_closing_tags_dont_have_extra_dash', 'Comment tags should not have extra dash.')
         return False
     else:
@@ -684,14 +633,14 @@ def no_restricted_characters_in_content(err):
 # ****************************************************************************************************
 #   CHECK THAT THERE IS NOTHING BEFORE AND AFTER THE ROOT TAG
 # ****************************************************************************************************
-def no_invalid_content_after_root_tag(err):
+def no_invalid_content_after_root_tag(err, xmlstr):
     """
     And that there is nothing below the ending root tag
     :return: boolean
     """
     # check after the ending root tag
-    last_char = getstring()[-1]
-    after = getstring()[-1:]
+    last_char = xmlstr[-1]
+    after = xmlstr[-1:]
     if last_char != '>' and after != '':
         err.add_msg('no_invalid_content_after_root_tag',
                     'Content after the ending root tag is disallowed. Even spaces - please delete them.')
@@ -736,48 +685,26 @@ def run():
     """
     # if - check is needed first to sort out angle brackets.
     # two vital functions depend on this (get_all_tags_in_order() and get_clean_tags())
-    if no_redundant_brackets(err) and number_of_angle_brackets_is_even(err) and \
-                            number_of_opening_and_closing_brackets_match(err):
+    if no_redundant_brackets(err, xmlstr=getstring(), linenum=get_line_numbers() ) and \
+       number_of_angle_brackets_is_even(err, xmlstr=getstring()) and \
+       number_of_opening_and_closing_brackets_match(err, xmlstr=getstring()):
 
-        no_invalid_initial_characters_in_opening_tag(err)
-        no_spaces_or_attributes_in_closing_tags(err)
-        starts_with_xml_declaration(err)
+        no_invalid_initial_characters_in_opening_tag(err, tags_order=get_all_tags_in_order())
+        no_spaces_or_attributes_in_closing_tags(err, tags_order=get_all_tags_in_order())
+        starts_with_xml_declaration(err, xmlstr=getstring())
         root_tags_match(err)
         element_names_contain_only_valid_characters(err)
         closing_tag_must_start_with_forward_slash(err)
         paired_elements_are_closed_properly_and_names_match(err)
         single_element_is_correctly_formed_case_without_attribute(err)
-        all_lowercase_tags(err)
+        all_lowercase_tags(err, tags_order=get_all_tags_in_order())
         is_nesting_proper(err)
         is_number_of_comment_tags_even(err)
         is_comment_opening_tag_followed_by_closing_tag(err)
-        comment_closing_tags_dont_have_extra_dash(err)
+        comment_closing_tags_dont_have_extra_dash(err, xmlstr=getstring())
         no_restricted_characters_in_content(err)
-        no_invalid_content_after_root_tag(err)
+        no_invalid_content_after_root_tag(err, xmlstr=getstring())
 
-'''
-if no_redundant_brackets(err):
-    if number_of_angle_brackets_is_even(err):
-        if number_of_opening_and_closing_brackets_match(err):
-            if starts_with_xml_declaration(err):
-                if root_tags_match(err):
-                    if no_initial_space_in_opening_tags(err):
-                        if no_invalid_initial_characters_in_opening_tag(err):
-                            if element_names_contain_only_valid_characters(err):
-                                if closing_tag_incorrectly_formed(err):
-                                    if no_spaces_in_closing_tags(err):
-                                        if paired_elements_are_closed_properly_and_names_match(err):
-                                            if closing_tags_that_are_not_single_dont_have_attributes(err):
-                                                if single_element_is_correctly_formed_case_without_attribute(err):
-                                                    if all_lowercase_tags(err):
-                                                        if is_nesting_proper(err):
-                                                            if is_number_of_comment_tags_even(err):
-                                                                if is_comment_opening_tag_followed_by_closing_tag(err):
-                                                                    if comment_closing_tags_dont_have_extra_dash(err):
-                                                                        if no_restricted_characters_in_content(err):
-                                                                            if no_invalid_content_after_root_tag(err):
-                                                                                print('Document is well formed!')
-'''
 
 # run the program
 run()

@@ -7,7 +7,7 @@ from xml_well_formedness_check.checker1 import *
 
 
 def test_get_string():
-    assert getstring() != None
+    assert xmlstr() != None
 
 
 def test_root_element_opening():
