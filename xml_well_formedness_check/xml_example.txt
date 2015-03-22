@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>bbb
 <!DOCTYPE greeting SYSTEM "hello.dtd">ddd
+
+
+
+
+
 <note &id=''>fff
+
     <!-- hahaha -->
     <to b = "111"><aaa  />
         <aaa/>
@@ -9,10 +15,12 @@
             <lastname a= " sds">Brown John</lastname>
         <from> hjhj
             <br />
-            <!--  -->
-            Jani
+            <!--  --><mm>
+            Jani <l    j >
+            <ffff/>
         </from>
         <from >
+
             Matjaz
         </from><war/><sss/>
     </to>
@@ -26,7 +34,7 @@
         <img>
             <a2>
                 <from >
-                    <from>uu< ></from>
+                    <from>uu</from>
                 </from>
             </a2>
         </img>

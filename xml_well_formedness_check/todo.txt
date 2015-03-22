@@ -12,14 +12,6 @@ TO DO:
         - second: apply errorLog class and see if you can use line numbers there
         COMMENT: TWO OPENING or CLOSING BRACKETS CAN't BE ONE RIGHT AFTER THE OTHER?
 
-   - BUG: no_orphan_brackets():
-        - It shows previous line number 1 for bracket on line 3. For example:
-        1 <aaa>
-        2
-        3 ><bbb>
-        4 <ccc>
-        - doesn't pick up opening orphan bracket after the end of end root tag. It does pick up closing bracket.
-
     - BUG (SEVERE): not recognizing nesting
     Doesn't pick up two consecutive <img><img> tags or </img></img>.
     Seems the bug comes up when even number of tags but have opening or both have closing tag.
@@ -40,12 +32,10 @@ TO DO:
     Make sure that there is a check that checks whether </img><img> is in incorrect order (while checking
     for nesting or as separete check) - should function paired_elements_are_closed_properly_and_names_match do that ()?
 
-OK? - BUG: doesn't recognize <> as invalid characters as data content (invalid chars are <, >, &).
-    Neither orphan brackets function works - because <> is considered an empty tag (all three initial checks in
-    run() function are satisfied: no_orphan_brackets, number of brackets is even, number of opening and closing brackets match).
-    So what is the check then for an empty tag <> ? NOW FIXED IN LOWERCASE FUNCTION. CHECKS FO EMPTY TAG.
-    AS SOON AS THERE A SINGLE TAG, ORPHAN FUNCTION PICKS IT UP.
-
+    - BUG: function paired_elements_are_closed_properly_and_names_match recognizes tag <   mm> or <    l > as <>
+    It says: The following opening tag names don't have a match: <>
+    Seems like it depended on first checking there are no initial spaces in tags.
+    I can either implement checking for initial spaces first or fix the "pair" function.
 
     - program works only when functions in a long if statement. If no if statement, then functions return duplicate results
     because same checks are used in different functions. Benefit is that all errors are shown in one list (nice!) versus
@@ -59,7 +49,19 @@ OK? - BUG: doesn't recognize <> as invalid characters as data content (invalid c
     Why only the second tag name??? Should list both opening tags. - NOT A HUGE ISSUE
 
 
+OK   - BUG: no_redundant_brackets():
+        - It shows previous line number 1 for bracket on line 3. For example:
+        1 <aaa>
+        2
+        3 ><bbb>
+        4 <ccc>
+        - doesn't pick up opening orphan bracket after the end of end root tag. It does pick up closing bracket.
 
+OK? - BUG: doesn't recognize <> as invalid characters as data content (invalid chars are <, >, &).
+    Neither orphan brackets function works - because <> is considered an empty tag (all three initial checks in
+    run() function are satisfied: no_redundant_brackets, number of brackets is even, number of opening and closing brackets match).
+    So what is the check then for an empty tag <> ? NOW FIXED IN LOWERCASE FUNCTION. CHECKS FO EMPTY TAG.
+    AS SOON AS THERE A SINGLE TAG, ORPHAN FUNCTION PICKS IT UP.
 
 OK    - BUG: in get_clean_tags(). Doesn't work for tags that have space after <.
     split = [tag.split() for tag in no_slash]   # problem: if I split when tag has initial space, it doesn't work.
@@ -87,7 +89,7 @@ OK  - BUG: if tag has extra > at the end it throws error - FIXED - first two fun
     for example <from>>
 
 
-    - test well funciton no_orphan_brackets(), especially part: if brackets[i+1] == bracket (must not produce index out of range error)
+    - test well funciton no_redundant_brackets(), especially part: if brackets[i+1] == bracket (must not produce index out of range error)
     - check comments in all functions (including utilities) for bugs, problems
     - see what else is needed from the list (ignore attribs for now)
     - clean up docstrings

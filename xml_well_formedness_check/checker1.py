@@ -6,7 +6,7 @@
     PLAYING WITH REMOVING NESTED IF STATEMENTS IN run() FUNCTION.
     REVERT BACK TO NESTED IF TOO COMPLICATED.
 
-    - DO gestring() MTHOD - PASS AS ARGUMENT TO FUNCTIONS (OR/AND USE CLASS)
+    - DO gestring() METHOD - PASS AS ARGUMENT TO FUNCTIONS (OR/AND USE CLASS)
     - DO LINE NUMBERS
     - get_all_tags_in_order() function blows up when brackets are out of place or extra/missing!
     (rewrite or put bracket-checking functions before it)
@@ -32,7 +32,7 @@ class ErrorLog():
         """
         self.count += 1
         self.sText += "\n============================================================="
-        self.sText += "\nFrom " + s_src +":\n" + s_msg.strip()      # strip cleans up any newline chars in messages for nicer display
+        self.sText += "\nFrom " + s_src + ":\n" + s_msg.strip()      # strip cleans up any newline chars in messages for nicer display
 
 err = ErrorLog()
 
@@ -40,7 +40,7 @@ err = ErrorLog()
 #   CHECK THAT DOCUMENT DOESN'T HAVE EXTRA-ORPHAN BRACKETS
 # ****************************************************************************************************
 
-def no_orphan_brackets(err):
+def no_redundant_brackets(err):
     """
     Check that there are no orphan, single, obsolete, extra brackets.
     Each opening bracket should have a closing pair (<,>).
@@ -48,37 +48,81 @@ def no_orphan_brackets(err):
     - every > must have < as the next bracket
     - every < must have > as the previous bracket
     - find places where these two rules are violated
+
+    Steps:
+    - get line numbers for all the brackets
+    - compare two consecutive brackets
+    - if they re the same, then one of them is orphan bracket
+    - line number will depend on whether it's opening or closing bracket
     :return: boolean
     """
-    # get ordered list of all indexed brackets
-    brackets = [ (ind, i) for ind, i in enumerate(getstring()) if i == '<' or i == '>']
-    #print(brackets)
+    # get line numbers for all the brackets
+    brackets_line_numbers = []
+    for tup in get_line_numbers():
+        for char in tup[1]:
+            if char == '<' or char == '>':
+                #print(tup[0], char)
+                brackets_line_numbers.append((tup[0], char))
 
-    # get list of lengths of each line
-    line_lenghts = [ len(line[1]) for line in get_line_numbers() ]
-
-    # get list of lengths of each line in growing fashion. Each length is a sum of previous lengths.
-    # this is to have intervals in which we look for bracket position
-    increasing_line_lengths=[0] # Needs to start at zero!
-    s=0
-    for i in line_lenghts:
-        s += i
-        increasing_line_lengths.append(s)
-    #print('Increasing line lengths: ', increasing_line_lengths)
-
-    # implement "sliding window" technique, that is compare two consecutive brackets. They should not be the same.
-    for i, bracket in enumerate(brackets[:-1]):
-        if brackets[i+1][1] == bracket[1]:
-            # find interval in which bracket falls
-            for ind, brack in enumerate(increasing_line_lengths[:-1]):
-                if bracket[0] >= brack and bracket[0] < increasing_line_lengths[ind + 1]:
-                    number, content = get_line_numbers()[ind]  # tuple unpacking of line number and the line content
-                    #print('Document has extra-orphan bracket(s) on line number ' + str(number) + ': ' + content)
-                    #print(err.sText + str(number) + ': ' + content)
-                    err.add_msg('no_orphan_brackets', 'Document has extra-orphan bracket(s) on line number '
-                                                      + str(number) + ': ' + content)
-
+    # compare two consecutive brackets
+    # if they are the same, then one of them is orphan bracket
+    # line number will depend on whether it's opening or closing bracket
+    for ind, br in enumerate(brackets_line_numbers[:-1]):
+        # IMPORTANT:
+        # Two if statements:
+        # first for consecutive opening brackets (<<). Uses br[0] to show line number.
+        # second for consecutive closing brackets (>>). Uses brackets_line_numbers[ind+1][0] to show line number.
+        # Function returns incorrect line number of erroneous bracket if above is ignored.
+        if br[1] == '<' and brackets_line_numbers[ind+1][1] == '<':
+            op = br[0]
+            line_num, content = get_line_numbers()[op-1] # -1, just indicates appropriate start of counting
+            err.add_msg('no_redundant_brackets',
+                        'Redundant bracket(s) or nested empty brackets on line ' + str(line_num) + ': ' + content.lstrip())
             return False
+        if br[1] == '>' and brackets_line_numbers[ind+1][1] == '>':
+            cl = brackets_line_numbers[ind+1][0]
+            line_num, content = get_line_numbers()[cl-1] # -1, just indicates appropriate start of counting
+            err.add_msg('no_redundant_brackets',
+                        'Redundant closing bracket(s) or empty nested brackets on line ' + str(line_num) + ': ' + content.lstrip())
+            return False
+
+
+    # check for empty tags
+
+    # get all brackets with indexes
+    count_br = [ (count, br) for count, br in enumerate(getstring()) if br == '<' or br == '>' ]
+    #print(count_br)
+
+    zipped = zip(brackets_line_numbers, count_br)
+    z = list(zipped)
+
+    l=[]
+    for i in z:
+        a,b = i
+        l.append((a[0], b[0], b[1]))  # gives triples [(1, 0, '<'), (1, 53, '>'), (2, 58, '<'),...]
+
+    for ind, br in enumerate(l[:-1]):
+        # variables
+        space_between_brackets = getstring()[br[1] + 1: l[ind + 1][1]]
+        start_line = br[0]
+        ending_line = l[ind + 1][0]
+        start_line_content = get_line_numbers()[start_line - 1][1]
+
+        # if statements
+        if space_between_brackets.isspace() and '\n' in space_between_brackets \
+                                            and br[2] == '<' and l[ind+1][2] == '>':
+            err.add_msg('no_redundant_brackets',
+                        'Empty tag starting on line ' + str(start_line) + ' and ending on line ' + str(ending_line) + '.')
+            return False
+        elif space_between_brackets.isspace() and br[2] == '<' and l[ind+1][2] == '>':
+            err.add_msg('no_redundant_brackets',
+                        'Empty tag on line ' + str(start_line) + ': ' + start_line_content.strip())
+            return False
+        elif space_between_brackets == '' and br[2] == '<' and l[ind+1][2] == '>':
+            err.add_msg('no_redundant_brackets',
+                        'Empty tag(s) on line ' + str(start_line) + ': ' + start_line_content.strip())
+            return False
+
     return True
 
 
@@ -194,7 +238,7 @@ def root_tags_match(err):
 
     # now tags should be in clean form to be compared (eg example, example)
     if opening != closing:
-        err.add_msg('root_tags_match', 'Root tags don\'t match: ' + opening + ' ' + closing)
+        err.add_msg('root_tags_match', 'Root tags don\'t match: (' + opening.strip() + ', ' + closing.strip() + ')')
         return False
     else:
         return True
@@ -424,13 +468,15 @@ def paired_elements_are_closed_properly_and_names_match(err):
         mismatching_tag_name_cl[i] = name[0]+'/'+name[1:]
 
     if len(mismatching_tag_name_op) != 0:
+        mism_tag_op = ', '.join(mismatching_tag_name_op)
         # check - always shows opening tag as without a match, even when closing one is problematic
         err.add_msg('paired_elements_are_closed_properly_and_names_match. ',
-                    'The following opening tag names don\'t have a match: ' + str(mismatching_tag_name_op))
+                    'The following opening tag names don\'t have a match: ' + mism_tag_op)
         return False
     elif len(mismatching_tag_name_cl) != 0:
+        mism_tag_cl = ''.join(mismatching_tag_name_cl)
         err.add_msg('paired_elements_are_closed_properly_and_names_match. ',
-                    'The following closing tag names don\'t have a match: ' + str(mismatching_tag_name_cl))
+                    'The following closing tag names don\'t have a match: ' + mism_tag_cl)
         return False
     else:
         return True
@@ -447,7 +493,7 @@ def all_lowercase_tags(err):
     """
     for tag in get_all_tags_in_order():
         if tag == '<>' or tag[1:-1].isspace():
-            err.add_msg('all_lower_case', 'Incorrect tag name. Tag is empty: ' + tag)
+            err.add_msg('all_lower_case', 'Found empty tag: ' + tag)
             return False
         if not tag.islower() and tag[1] != '?' and tag[1] != '!':
             err.add_msg('all_lower_case', 'Incorrect tag name. Should be lower case: ' + tag)
@@ -690,7 +736,7 @@ def run():
     """
     # if - check is needed first to sort out angle brackets.
     # two vital functions depend on this (get_all_tags_in_order() and get_clean_tags())
-    if no_orphan_brackets(err) and number_of_angle_brackets_is_even(err) and \
+    if no_redundant_brackets(err) and number_of_angle_brackets_is_even(err) and \
                             number_of_opening_and_closing_brackets_match(err):
 
         no_invalid_initial_characters_in_opening_tag(err)
@@ -710,7 +756,7 @@ def run():
         no_invalid_content_after_root_tag(err)
 
 '''
-if no_orphan_brackets(err):
+if no_redundant_brackets(err):
     if number_of_angle_brackets_is_even(err):
         if number_of_opening_and_closing_brackets_match(err):
             if starts_with_xml_declaration(err):

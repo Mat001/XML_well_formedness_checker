@@ -22,7 +22,7 @@ def get_line_numbers():
         with open('/home/matjaz/PycharmProjects/xml_well_formedness_check/'
                   'xml_well_formedness_check/xml_example.txt', 'r') as f:
             # get line numbers
-            line_numbers = [ (num+1, line) for num, line in enumerate(f) ]  # use num+1 to start counting lines at 1
+            line_numbers = [ (num, line) for num, line in enumerate(f, 1) ]  # use num+1 to start counting lines at 1
             return line_numbers
 
     except IOError as e:
