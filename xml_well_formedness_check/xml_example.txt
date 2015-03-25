@@ -4,13 +4,13 @@
 <note &id=''>fff
 
     <!-- hahaha -->
-    <to b = "111"><aaa  />
-        <aaa/>
+    <to b = "111"><aaa/ >
+        <aaa / >
         <!-- this a test xml file -->
             <firstname b="12">Tov%e</firstname>
             <lastname a= " sds">Brown John</lastname>
         <from> hjhj
-            <br />
+            <br/>
             <!--  --><mm>
             Jani <l    j >
             <ffff/>
@@ -18,10 +18,10 @@
         <from >
 
             Matjaz
-        </from><war/><sss/>
+        </from><war/><war><sss/>
     </to>
     <!-- this a test xml file -->
-    <br />
+    <br/>
     <from/>
         test
     <img><img>
