@@ -3,7 +3,12 @@
     author: Matjaz Pirnovar
     date: Feb-Mar 2015
 
-    - DO LINE NUMBERS
+    - FIX GIT & GITHUB
+    - FIX LAST FUNCTION ERROR DISPLAY - content under the last root tag
+    - DEBUG NESTING
+    - CHECK IF LATEST FIXES AND LINE NUMBERS ARE WORKING
+    - SORT OUT IF STATEMENT ORDER IN run FUNCTION
+    - DEBUG THE REST OF THE BUGS
     - get_all_tags_in_order() function blows up when brackets are out of place or extra/missing!
     (fixed by checking brackets first by functions: no_redundant_brackets, no_of_brackets_even, matching_brackets)
 """
