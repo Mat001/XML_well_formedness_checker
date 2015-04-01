@@ -19,16 +19,17 @@ class Utility():
         """
             Read file twice.
             First to get a string of xml file.
-            Second to get line numbers.
+            Second to get line numbers and line content.
             These are purposely placed into the initializer so file reading is done only once (for each) and
-            then passed to appropriate functions in this and checker1 module. With this we're avoiding to read from file
-            each time a function that requests xml file-string is called.
+            then passed to appropriate functions in this module and checker1 module.
+            With this we're avoiding to read from file each time a function that requests xml file-string is called
+            (previously each function had a call to a function that reads from file -
+            hence file was being read many times - bad practice).
         """
 
         """
-            Get line numbers for each line of XML file
-            Function counts empty lines too and that is fine (OttoTag does that too).
-            :return: list of tuple pairs: line number, line
+            Get xml file as a string.
+            :return: string
         """
         logging.basicConfig(level=logging.DEBUG)
         try:
@@ -48,7 +49,7 @@ class Utility():
         try:
             with open(self.path_to_file, 'r') as f:
                 # get line numbers
-                self.line_numbers = [(num, line) for num, line in enumerate(f, 1)]  # use num+1 to start counting lines at 1
+                self.line_numbers = [(num, line) for num, line in enumerate(f, 1)]  # param 1 to start counting lines at 1
 
         except IOError as e:
             logging.error(e)

@@ -1,36 +1,35 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>bbb
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>ooo
 <!DOCTYPE greeting SYSTEM "hello.dtd">ddd
 
-<note &id=''>fff
-
+<note   &id=''>fff
     <!-- hahaha -->
-    <to b = "111"><aaa/ >
-        <aaa / >
+    <to b = "111"> <aaa/>
+        <aaa/>
+        <bbb><bbb><bbb>
         <!-- this a test xml file -->
-            <firstname b="12">Tov%e</firstname>
+            <firstname b="12">u&u</firstname>
             <lastname a= " sds">Brown John</lastname>
         <from> hjhj
             <br/>
-            <!--  --><mm>
+            <!--  -->
             Jani <l    j >
             <ffff/>
         </from>
-        <from >
+        <frommm     >
 
             Matjaz
         </from><war/><war><sss/>
     </to>
-    <!-- this a test xml file -->
-    <br/>
-    <from/>
-        test
+    <!-- this a test xml file ----->
+    <br/><    elephant> <   ll >
+    <from />
     <img><img>
     <from>category1 | category2 | category3</from>
     <a1>
         <img>
             <a2>
                 <from >
-                    <from>uu</from>
+                    <from>u&u</from>
                 </from>
             </a2>
         </img>
@@ -40,3 +39,4 @@
     <body id="">Don't forget me this weekend!
 </body>
 </note>
+ccc

@@ -3,13 +3,9 @@
     author: Matjaz Pirnovar
     date: Feb-Mar 2015
 
-    PLAYING WITH REMOVING NESTED IF STATEMENTS IN run() FUNCTION.
-    REVERT BACK TO NESTED IF TOO COMPLICATED.
-
-    -DONE DO gestring() METHOD - PASS AS ARGUMENT TO FUNCTIONS (OR/AND USE CLASS)
     - DO LINE NUMBERS
     - get_all_tags_in_order() function blows up when brackets are out of place or extra/missing!
-    (fixed by checking brackets forst by functions: no_redundant_brackets, no_of_brackets_even, matching_brackets)
+    (fixed by checking brackets first by functions: no_redundant_brackets, no_of_brackets_even, matching_brackets)
 """
 
 from xml_well_formedness_check.utility_functions import utility
@@ -34,7 +30,7 @@ class ErrorLog():
         self.sText += "\n============================================================="
         self.sText += "\nFrom " + s_src + ":\n" + s_msg.strip()      # strip cleans up any newline chars in messages for nicer display
 
-# error objectfor printing warning messages
+# error object for printing warning messages
 err = ErrorLog()
 
 # ****************************************************************************************************
@@ -77,7 +73,7 @@ def no_redundant_brackets(err, xmlstr, linenum):
             op = br[0]
             line_num, content = linenum[op-1] # -1, just indicates appropriate start of counting
             err.add_msg('no_redundant_brackets',
-                        'Redundant bracket(s) or nested empty brackets on line ' + str(line_num) + ': ' + content.lstrip())
+                        'Redundant, missing or nested empty bracket(s) on line ' + str(line_num) + ': ' + content.lstrip())
             return False
         if br[1] == '>' and brackets_line_numbers[ind+1][1] == '>':
             cl = brackets_line_numbers[ind+1][0]
@@ -130,7 +126,7 @@ def no_redundant_brackets(err, xmlstr, linenum):
 #   CHECK THAT NUMBER OF < and > IS EVEN
 # ****************************************************************************************************
 
-#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!!
+#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!! - BUT how to define the affected line?
 
 def number_of_angle_brackets_is_even(err, xmlstr):
     """
@@ -152,7 +148,7 @@ def number_of_angle_brackets_is_even(err, xmlstr):
 #   CHECK THAT NUMBERS OF < and > MATCH
 # ****************************************************************************************************
 
-#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!!
+#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!! - BUT how to define the affected line?
 
 def number_of_opening_and_closing_brackets_match(err, xmlstr):
     """
@@ -201,9 +197,6 @@ def starts_with_xml_declaration(err, xmlstr, linenum):
 # ****************************************************************************************************
 #   COMPARE OPENING AND CLOSING TAGS OF THE ROOT ELEMENT IF THEY MATCH
 # ****************************************************************************************************
-
-#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!!
-
 def root_tags_match(err):
     """ Compare opening and closing root element if they match.
     :return: boolean
@@ -229,26 +222,44 @@ def root_tags_match(err):
 
     # now tags should be in clean form to be compared (eg example, example)
     if opening != closing:
-        err.add_msg('root_tags_match', 'Root tags don\'t match: (' + opening.strip() + ', ' + closing.strip() + ')')
+
+        # get line number and content
+        op_number, op_line = 0, ''
+        cl_number, cl_line = 0, ''
+        root_el=utility.get_root_element()
+        for e in utility.line_numbers:
+            if root_el[0] in e[1] :
+                op_number, op_line =  e
+            if root_el[1] in e[1]:
+                cl_number, cl_line = e
+
+        err.add_msg('root_tags_match', 'Root tags don\'t match on:\n'
+                    + 'line ' + str(op_number) + ': ' + op_line.strip() +
+                    '\nline ' + str(cl_number) + ': ' + cl_line.strip())
         return False
     else:
         return True
 
 
 # ****************************************************************************************************
-#   CHECK THAT THERE NO SPACE IN CLOSING TAGS
+#   CHECK THAT THERE ARE NO SPACE IN CLOSING TAGS
 # ****************************************************************************************************
-
-#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!!
-
 def no_spaces_or_attributes_in_closing_tags(err, tags_order):
     """
-    Check that closing tags don't have spaces. INCLUDE SINGLE EMPTY TAGS!!!
+    Check that paired (non-empty) closing tags don't have spaces.
     :return: boolean
     """
     for tag in tags_order:
-        if (tag[1] == '/' and ' ' in tag[1:]) or (tag[-2]=='/' and ' ' in tag[:-2]):
-            err.add_msg('no_spaces_or_attributes_in_closing_tags', 'Closing tag must not have spaces or attributes: ' + tag)
+        if (tag[1] == '/' and ' ' in tag[1:]):
+
+            # get line number and line content
+            num, content = 0, ''
+            for e in utility.line_numbers:
+                if tag in e[1]:
+                    num, content = e
+
+            err.add_msg('no_spaces_or_attributes_in_closing_tags',
+                        'Closing tag must not have spaces or attributes. Line ' + str(num) + ': ' + content.strip())
             return False
     return True
 
@@ -256,9 +267,6 @@ def no_spaces_or_attributes_in_closing_tags(err, tags_order):
 # ****************************************************************************************************
 #   CHECK THAT CLOSING TAGS START WITH </
 #  ****************************************************************************************************
-
-#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!!
-
 def closing_tag_must_start_with_forward_slash(err):
     """
     Check that closing tags start with '</' .
@@ -273,9 +281,18 @@ def closing_tag_must_start_with_forward_slash(err):
         # if it has '/' it should be immediatelly after <
         if '/' in tag:
             if not tag.startswith('</'):
-                err.add_msg('closing_tag_must_start_with_forward_slash', 'Closing tag must start with forward slash '
-                                                              '(must start with \'</\' if tag has open tag counterpart '
-                                                              'or end with \'/>\' if the tag is single): ' + tag)
+
+                # get line numbers and line content
+                num, content = 0, ''
+                for e in utility.line_numbers:
+                    if tag in e[1]:
+                        num, content = e
+
+                err.add_msg('closing_tag_must_start_with_forward_slash',
+                            'Closing tag must start with forward slash '
+                            'if tag has open tag counterpart (non-empty element) \n'
+                            'or end with \'/>\' if the tag is single (empty element). \n'
+                            'Line ' + str(num) + ': ' + content.strip())
                 return False
     return True
 
@@ -283,9 +300,6 @@ def closing_tag_must_start_with_forward_slash(err):
 # ****************************************************************************************************
 #   CHECK FOR INVALID CHARACTERS AT THE BEGINNING OF TAG NAME
 # ****************************************************************************************************
-
-#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!!
-
 def no_invalid_initial_characters_in_opening_tag(err, tags_order):
     """
     Element names must not start with digits, diacritics, the full stop, the hyphen and 'xml' (any letter case).
@@ -302,8 +316,16 @@ def no_invalid_initial_characters_in_opening_tag(err, tags_order):
     for tag in tags_order:
         for char in invalid_start_characters:
             if tag[1:].startswith(char):
+
+                # get line number and line content
+                num, content = 0, ''
+                for e in utility.line_numbers:
+                    if tag in e[1]:
+                        num, content = e
+
                 err.add_msg('no_invalid_initial_characters_in_opening_tag',
-                            'Tag with invalid start character (including space): ' + tag)
+                            'Invalid start character (including space) on line ' + str(num)
+                            + ': ' + content.strip())
                 return False
 
 
@@ -315,16 +337,31 @@ def no_invalid_initial_characters_in_opening_tag(err, tags_order):
             not tag[1] == '_' and \
             not tag[1] == ':' and \
             not tag[1] == '/':
+
+            # get line number and line content
+            num, content = 0, ''
+            for e in utility.line_numbers:
+                if tag in e[1]:
+                    num, content = e
             err.add_msg('no_invalid_initial_characters_in_opening_tag',
-                            'Element name should start with letter, underscore or colon: ' + tag)
+                            'Element name should start with letter, underscore or colon on line ' +
+                            str(num) + ': ' + content.strip())
             return False
+
         # case for malformed single element
         if tag[1] != '?' and tag[1] != '!' and \
-            tag[1] == '/' and tag.endswith('/>'): #and \
-            #element_names_contain_only_valid_characters():
+            tag[1] == '/' and tag.endswith('/>'):
+
+            # get line number and line content (for this problematic tag)
+            num, content = 0, ''
+            for e in utility.line_numbers:
+                if tag in e[1]:
+                    num, content = e
+
             err.add_msg('no_invalid_initial_characters_in_opening_tag',
                         'Element name should start with letter, underscore or colon. '
-                        '\nOr ambiguity if this is a closing tag or a single element: ' + tag)
+                        '\nOr ambiguity if this is a closing tag or a single element. On line ' +
+                        str(num) + ': ' + content.strip())
             return False
     else:
         return True
@@ -333,9 +370,6 @@ def no_invalid_initial_characters_in_opening_tag(err, tags_order):
 # ****************************************************************************************************
 #   CHECK THAT ELEMENT NAMES CONTAIN ONLY VALID CHARACTERS
 # ****************************************************************************************************
-
-#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!!
-
 def element_names_contain_only_valid_characters(err):
     """
     Rule 1:
@@ -353,8 +387,16 @@ def element_names_contain_only_valid_characters(err):
     #p = re.compile('[ A-Za-z0-9_:.-]*$')
     for name in names:
         if not re.match(r'[ A-Za-z0-9_:.-]*$', name):
+
+            # get line numbers and line content
+            num, content = 0, ''
+            for e in utility.line_numbers:
+                if name in e[1]:
+                    num, content = e
+
             err.add_msg('element_names_contain_only_valid_characters',
-                        'Element name contains invalid character(s) - allowed are letters, digits, _, :, ., - : ' + name)
+                        'Element name contains invalid character (allowed are letters, digits, _, :, ., -). '
+                        'On line ' + str(num) + ': ' + content.strip())
             return False
     return True
 
@@ -362,9 +404,6 @@ def element_names_contain_only_valid_characters(err):
 # ****************************************************************************************************
 #   CHECK THAT ELEMENTS ARE CLOSED PROPERLY AND NAMES MATCH (PAIRED ELEMENTS, NOT SINGLE ONES)
 # ****************************************************************************************************
-
-#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!!
-
 def paired_elements_are_closed_properly_and_names_match(err):
     """
     Check that paired elements (not single ones) are closed properly.
@@ -372,97 +411,55 @@ def paired_elements_are_closed_properly_and_names_match(err):
     If it doesn't, then either < or </ are mis-formatted or are missing.
     :return: boolean
     """
-    # REMOVING DUPLICATE - SAFETY CHECK
-    # This is only a preliminary partial check -> fails when there is even number of missing brackets of the same type!
-    # The rest of the code below must run for complete check
-    #if not number_of_angle_brackets_is_even(err):
-    #    err.add_msg('paired_elements_are_closed_properly_and_names_match',
-    #                'Elements not properly closed. Number of angle brackets is not even - tag(s) incorrectly formed.')
-    #    return False
+    # start by getting clean tags
+    clean = utility.get_clean_tags()
 
-    #if not number_of_opening_and_closing_brackets_match(err):
-    #    err.add_msg('paired_elements_are_closed_properly_and_names_match',
-    #                'Numbers of opening and closing brackets don\'t match.')
-    #   return False
+    # add unpaired items to a list
+    unpaired_tags = []
+    for item in clean:
+        if item not in unpaired_tags:
+            unpaired_tags.append(item)
+        elif item in unpaired_tags:
+            unpaired_tags.remove(item)
 
-    # get all tags and clean them up
-    tags = utility.remove_declaration_doctype_comments()
+    # get elements that are unique - that are shown only once (ignoring duplicates)
+    print('UNPAIRED TAGS: ', unpaired_tags)
+    # retrieve full tag structures of unpaired tags. So I can check if they are in line numbers lines.
+    # Shortened version (ie l vs <    l > may be problematic when finding line number and content.
 
-    # get rid of singles (that end with '/>'
-    l = [ tag for tag in tags if '/>' not in tag ]
+    # make list of tuples: (index of a tag, tag name)
+    numbered=[]
+    l1 = [ (ind, tag) for ind, tag in enumerate(clean) ]
+    for i in l1:
+        for t in unpaired_tags:
+            if t == i[1]:
+                numbered.append(i)
 
-    # get rid of any attributes in opening tags
-    l2=[]
-    indices = []
-    for i, tag in enumerate(l):
-        #if ' ' in tag and tag.startswith('</'):
-        #    err.add_msg('paired_elements_are_closed_properly_and_names_match',
-        #                'Closing tag must not contain spaces.' + tag)
-        #    return False
-        if ' ' in tag and '/' not in tag:
-            space_pos = tag.index(' ')
-            open_name = tag[:space_pos] + '>'
-            l2.append(open_name)    # a list of changed opening names
-            indices.append(i)
+    # et tuples of index and tag for full tags in order without comments
+    all_tags = [ (ind, tag) for ind, tag in enumerate(utility.remove_declaration_doctype_comments()) ]
 
-    for count, tag in enumerate(l2):
-        l[indices[count]] = l2[count]      # this is the list of tags without attributes
+    # get full tags by intersecting indexes of all tags and numbered
+    full_tags =[]
+    for n in numbered:
+        for a in all_tags:
+            if n[0] == a[0]:
+                full_tags.append(a[1])
 
-
-    # MAKE CHECKS
-    # opening and closing bracket in place
-    both_brackets_in_place = [ tag for tag in l if tag.startswith('<') and tag.endswith('>') ]
-    if both_brackets_in_place == 0:
-        err.add_msg('paired_elements_are_closed_properly_and_names_match',
-                    'Opening and closing bracket not matching.')
-        return False
-    # no space in closing tag
-    #if no_spaces_in_closing_tags(err) != True:
-    #    err.add_msg('paired_elements_are_closed_properly_and_names_match',
-    #                'One or more closing tag(s) contains space.')
-    #    return False
-
-    # no space in opening tag
-    #if no_initial_space_in_opening_tags(err) != True:
-    #    err.add_msg('paired_elements_are_closed_properly_and_names_match',
-    #                'One or more opening tag(s) contains space at the begining of the tag.')
-    #    return False
-
-    # get content between tags and compare - find pair names that don't match
-    opening = [ tag for tag in l if not tag.startswith('</') ]
-    closing = [ tag for tag in l if tag.startswith('</') ]
-
-    closing_no_slashes = [ tag.replace('/','') for tag in closing if '/' in tag ]    # remove slashes
-    #print('CLOSING NO SLASHES: ', closing_no_slashes)
-
-    mismatching_tag_name_op = list(set(opening) - set(closing_no_slashes))
-    mismatching_tag_name_cl = list(set(closing_no_slashes) - set(opening))
-
-    # put slashes back to closing tags so they can be printed properly in error message
-    for i, name in enumerate(mismatching_tag_name_cl):
-        mismatching_tag_name_cl[i] = name[0]+'/'+name[1:]
-
-    if len(mismatching_tag_name_op) != 0:
-        mism_tag_op = ', '.join(mismatching_tag_name_op)
-        # check - always shows opening tag as without a match, even when closing one is problematic
-        err.add_msg('paired_elements_are_closed_properly_and_names_match. ',
-                    'The following opening tag names don\'t have a match: ' + mism_tag_op)
-        return False
-    elif len(mismatching_tag_name_cl) != 0:
-        mism_tag_cl = ''.join(mismatching_tag_name_cl)
-        err.add_msg('paired_elements_are_closed_properly_and_names_match. ',
-                    'The following closing tag names don\'t have a match: ' + mism_tag_cl)
-        return False
-    else:
-        return True
+    # get line number and content from full tags
+    num, content = 0, ''
+    for tag in full_tags:
+        for e in utility.line_numbers:
+            if tag in e[1]:
+                num, content = e
+                # move err.add_msg block into outer for loop scope
+                # if you want to display one error message at the time, instead of all of them
+                err.add_msg('paired_elements_are_closed_properly_and_names_match. ',
+                            'Tag \'' + tag + '\' doesn\'t have a match. On line ' + str(num) + ': ' + content.strip())
 
 
 # ****************************************************************************************************
 #   CHECK THAT TAGS ARE CASE SENSITIVE - CURRENTLY WORKS FOR LOWERCASE
 # ****************************************************************************************************
-
-#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!!
-
 def all_lowercase_tags(err, tags_order):
     """
     Check that tags are case sensitive.
@@ -470,11 +467,30 @@ def all_lowercase_tags(err, tags_order):
     :return: boolean
     """
     for tag in tags_order:
+
+        # empty tag is already checked in no_redundant_brackets(). Do I then really need this section?
+        # Check if there is realy a reason for this check of empty brackets.
         if tag == '<>' or tag[1:-1].isspace():
-            err.add_msg('all_lower_case', 'Found empty tag: ' + tag)
+
+            # get line numbers and line content
+            num, content = 0, ''
+            for e in utility.line_numbers:
+                if tag in e[1]:
+                    num, content = e
+
+            err.add_msg('all_lower_case', 'Found empty tag on line ' + str(num) + ': ' + content.strip())
             return False
+
         if not tag.islower() and tag[1] != '?' and tag[1] != '!':
-            err.add_msg('all_lower_case', 'Incorrect tag name. Should be lower case: ' + tag)
+
+            # get line numbers and line content
+            num, content = 0, ''
+            for e in utility.line_numbers:
+                if tag in e[1]:
+                    num, content = e
+
+            err.add_msg('all_lower_case',
+                        'Tag should be lower case on line ' + str(num) + ': ' + content.strip())
             return False
     return True
 
@@ -483,7 +499,7 @@ def all_lowercase_tags(err, tags_order):
 #   CHECK THAT NESTING IS PROPER
 # ****************************************************************************************************
 
-#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!!
+#  DEBUG !!!!!
 
 def is_nesting_proper(err):
     """
@@ -526,9 +542,16 @@ def is_nesting_proper(err):
         elif item == temp_list[-1]:
             temp_list.pop()
         else:
+            # get line numbers and line content
+            num, content = 0, ''
+            for e in utility.line_numbers:
+                if temp_list[-1] in e[1]:
+                    num, content = e
+
             err.add_msg('is_nesting_proper',
-                        'Incorrectly nested tag is \'' +temp_list[-1] +
-                        '\' or that tag needs to be a single tag ending with \'/>\'.')
+                        'Incorrectly nested tag is \'' + temp_list[-1] +
+                        '\' or that tag needs to be a single tag ending with \'/>\'.'
+                        '\nLine ' + str(num) + ': ' + content.strip())
             return False
 
     if len(temp_list) == 0:
@@ -539,7 +562,7 @@ def is_nesting_proper(err):
 #   IS NUMBER OF COMMENT TAGS EVEN
 # ****************************************************************************************************
 
-#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!!
+#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!! HOW? DOESN'T NEED LINE NUMBERS?
 
 def is_number_of_comment_tags_even(err):
     """
@@ -555,68 +578,40 @@ def is_number_of_comment_tags_even(err):
 
 
 # ****************************************************************************************************
-#   CHECK THAT OPENING COMMENT TAG IS FOLLOWED BY CLOSING TAG
-# ****************************************************************************************************
-
-#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!!
-
-def is_comment_opening_tag_followed_by_closing_tag(err):
-    """
-    # Check that each opening comment tag is followed by closing tag
-    Sequence of comment tags must follow: opening-closing_opening_closing.
-    Disallow two of the same one after the other. This will check for nesting.
-    :return: boolean
-    """
-    if is_number_of_comment_tags_even(err):
-        l=[]
-        # append position of opening tag then closing, then opening, then closing etc.
-        # sequence must be strictly sorted in ascending order, otherwise this function test fails-False
-        for i in range(len(utility.get_opening_comment_tag_positions())):
-            l.append(utility.get_opening_comment_tag_positions()[i])
-            l.append(utility.get_closing_comment_tag_positions()[i])
-        #print('SEQUENCE: ', l)
-        if l != sorted(l):
-            err.add_msg('is_comment_opening_tag_followed_by_closing_tag', 'Error in comment tags.')
-            return False
-        else:
-            return True
-    else:
-        err.add_msg('is_comment_opening_tag_followed_by_closing_tag', 'Number of comment tags is not even - wrong nesting.')
-        return False
-
-
-# ****************************************************************************************************
 #   CHECK THAT COMMENT CLOSING TAGS DONT HAVE EXTRA DASH (--->)
 # ****************************************************************************************************
-
-#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!!
-
 def comment_closing_tags_dont_have_extra_dash(err, xmlstr):
     """
     Check that comment closing tags don't have extra dash (--->).
     :return: boolean
     """
     if '--->' in xmlstr:
-        err.add_msg('comment_closing_tags_dont_have_extra_dash', 'Comment tags should not have extra dash.')
+
+        # get line numbers and line content
+        num, content = 0, ''
+        for e in utility.line_numbers:
+            if '--->' in e[1]:
+                num, content = e
+
+        err.add_msg('comment_closing_tags_dont_have_extra_dash',
+                    'Too many dashes in the closing tag in the comment. Line ' + str(num) + ': ' + content.strip())
         return False
     else:
         return True
 
 
+''' THIS FUNCTION IS ALREADY ADDRESSED WITH OTHER FUNCTIONS - CHECK IF THERE IS ANYTHING IT COULD BE USEFUL FOR
 # ****************************************************************************************************
 #   CHECK THAT SINGLE ELEMENTS ARE CORRECTLY FORMED - CASE WITHOUT ATTRIBUTE
 # ****************************************************************************************************
-
-#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!!
-
 def single_element_is_correctly_formed_case_without_attribute(err):
     """
     Check that single elements are correctly formed.
-    Examples: <example/> <br       />, <acb />, <child attribute="value" />
+    Examples: <example/> <br       />, <acb />, <child attribute="value" /> - THESE ARE ALL VALID
 
     # Done so far:
     # Includes proper closure!
-    # Not checking for space between name and / because it is allowed. It's for attributes, which still need to be checked.
+    # Not checking for space between name and /> because it is allowed. It's for attributes, which still need to be checked.
     # checking that there is no space between / and >
     # first part of the tag <... is already checked because functions no_initial_space_in_opening_tags(), ... take car of it
     # closing tag /> is validated here - no space between / and >
@@ -627,19 +622,23 @@ def single_element_is_correctly_formed_case_without_attribute(err):
     # test the correctness of the single tag (if '/' at the end before >)
     for tag in utility.get_single_elements():
         if not tag.endswith('/>') or tag.startswith('< '):
+
+            # get line numbers and line content
+            num, content = 0, ''
+            for e in utility.line_numbers:
+                if tag in e[1]:
+                    num, content = e
+
             err.add_msg('single_element_is_correctly_formed_case_without_attribute',
-                        'Problematic single element - not correctly formed: ' + tag)
+                        'Incorrectly formed single element on line ' + str(num) + ': ' + content.strip())
             return False
         else:
             return True
-
+'''
 
 # ****************************************************************************************************
 #   CHECK THAT NO RESTRICTED CHARACTERS ARE PRESENT IN DATA CONTENT
 # ****************************************************************************************************
-
-#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!!
-
 def no_restricted_characters_in_content(err):
     """
     TO SIMPLIFY, LIMIT RESTRICTED CHARS TO: <,>,&
@@ -656,12 +655,24 @@ def no_restricted_characters_in_content(err):
     """
     # get content between tags (>  <)g
     # check that it doesn't contain any of the above characters
+    # < and > will already be checked by no_redundant_brackets() unless a proper tag is formed
+    # (but in that case content data changes into a tag)
     restricted = [ '<', '>', '&' ]
     restricted_chars = [ char for char in utility.get_data_content() for c in restricted if c in char ]
     if len(restricted_chars) != 0:
-        err.add_msg('no_restricted_characters_in_content',
-                    'Invalid characters (<, >, &) in data content: ' + str(restricted_chars))
-        return False
+
+        print('RESTRICTED CHARS: ', restricted_chars)
+        # get line numbers and line content
+        num, content = 0, ''
+        for tag in restricted_chars:
+            for e in utility.line_numbers:
+                if tag in e[1]:
+                    num, content = e
+                    err.add_msg('no_restricted_characters_in_content',
+                                'Invalid characters (<, >, &) in data content on line: '
+                                + str(num) + ': ' + content.strip())
+
+            return False
     else:
         return True
 
@@ -670,19 +681,23 @@ def no_restricted_characters_in_content(err):
 #   CHECK THAT THERE IS NOTHING BEFORE AND AFTER THE ROOT TAG
 # ****************************************************************************************************
 
-#  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!!
+# FIX DISPLAY!!!!!! AND THEN DONE!
 
 def no_invalid_content_after_root_tag(err, xmlstr):
     """
     And that there is nothing below the ending root tag
     :return: boolean
     """
+
+    print(utility.line_numbers[-1:])
     # check after the ending root tag
     last_char = xmlstr[-1]
     after = xmlstr[-1:]
     if last_char != '>' and after != '':
+        #utility.line_numbers[:-1]
         err.add_msg('no_invalid_content_after_root_tag',
-                    'Content after the ending root tag is disallowed. Even spaces - please delete them.')
+                    'Content after the ending root tag is disallowed. Even spaces - please delete them.'
+                    '\nOn line ' + str(utility.line_numbers[-1:][0]) + ': ' + str(utility.line_numbers[-1:]))
         return False
     else:
         return True
@@ -735,11 +750,11 @@ def run():
         element_names_contain_only_valid_characters(err)
         closing_tag_must_start_with_forward_slash(err)
         paired_elements_are_closed_properly_and_names_match(err)
-        single_element_is_correctly_formed_case_without_attribute(err)
+        #single_element_is_correctly_formed_case_without_attribute(err)
         all_lowercase_tags(err, tags_order=utility.get_all_tags_in_order())
         is_nesting_proper(err)
         is_number_of_comment_tags_even(err)
-        is_comment_opening_tag_followed_by_closing_tag(err)
+        #is_comment_opening_tag_followed_by_closing_tag(err)
         comment_closing_tags_dont_have_extra_dash(err, xmlstr=utility.xml_string)
         no_restricted_characters_in_content(err)
         no_invalid_content_after_root_tag(err, xmlstr=utility.xml_string)

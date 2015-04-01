@@ -2,16 +2,10 @@ TO DO:
     FIX functions:
 
     - IMPORTANT:
-    HOW TO PASS getstring(), get_all_tags_in_order(), get_line_numbers(), get_clean_tags() as parameter or class object?
-    These functions should not be spread all over the code. INstead they should be passed as parameter to functions. Or as a class object -
-    but find out how and which method is better.
-    IMPORTANT: IN utility functions getstring() is used in several other untility functions which are in turn called in
-    main module checker1.py. That means there is parameter nesting. This is not good.
-    Try remove utility functions to use each other. That possible?
-    Or is there a way to use class/objects to get rid of this duplication/coupling?
 
-    - HOW TO ADD LINE NUMBER TO WARNINGS for no of tags not even, tags don't match?
-        - first option: function even tags has exception that allows further funcion checks until the point where linenumber can be pinpointed.
+    - HOW TO ADD LINE NUMBER TO WARNINGS for functions 'no of tags not even', 'tags don't match'?
+        - first option: function even tags has exception that allows further funcion checks until the point
+        where linenumber can be pinpointed.
         The problem with this is that get_all_tags_in_order() requires even and matching brackets.
         So either fix get_all_tags_in_order so it doesn't have to rely on even and matching brackets or
         fix functions even brackets, matching brackets to show line numbers.
@@ -38,10 +32,11 @@ TO DO:
     Make sure that there is a check that checks whether </img><img> is in incorrect order (while checking
     for nesting or as separete check) - should function paired_elements_are_closed_properly_and_names_match do that ()?
 
-    - BUG: function paired_elements_are_closed_properly_and_names_match recognizes tag <   mm> or <    l > as <>
-    It says: The following opening tag names don't have a match: <>
-    Seems like it depended on first checking there are no initial spaces in tags.
-    I can either implement checking for initial spaces first or fix the "pair" function.
+    - BUG: no_restricted_characters_in_content function duplicates error message if same data content with
+    same invalid character exists. For example:
+     <firstname b="12">u&u</firstname> on line 10 and
+     <from>u&u</from> on line 32
+     As solution I could use return False at the end of if statement to show one error message at the time
 
     - program works only when functions in a long if statement. If no if statement, then functions return duplicate results
     because same checks are used in different functions. Benefit is that all errors are shown in one list (nice!) versus
@@ -54,6 +49,31 @@ TO DO:
     - if I add <img ><img> to the xml file, the warning says The following opening tag names don't have a match:  ['<img>']
     Why only the second tag name??? Should list both opening tags. - NOT A HUGE ISSUE
 
+    - NICE TO HAVE:
+      Can I redesign Utility class initializer to only read file once (not for xml string and for line numbers separately)?
+      For example making it give an option to return an xml string or file with line numbers (as boolean flag in arg list?)
+      But - initializer is not suppose to return anything!!!!
+
+    - NICE TO HAVE: Using print('Invalid character on line {}: {}' .format(linenu, content)) method in error messages in functions (instead of concatenation)
+
+##############################################################
+
+OK  - BUG: function paired_elements_are_closed_properly_and_names_match() doesn't correctly recognize
+    multiple same tags: <bbb><bbb><bbb>
+
+OK  BUG: function paired_elements_are_closed_properly_and_names_match recognizes tag <   mm> or <    l > as <>
+    It says: The following opening tag names don't have a match: <>
+    Seems like it depended on first checking there are no initial spaces in tags.
+    I can either implement checking for initial spaces first or fix the "pair" function.
+    SOLUTION: First execute function no_invalid_initial_characters_in_opening_tag,
+
+OK, DONE - PUT IN Utiliy CLASS    HOW TO PASS getstring(), get_all_tags_in_order(), get_line_numbers(), get_clean_tags() as parameter or class object?
+    These functions should not be spread all over the code. INstead they should be passed as parameter to functions. Or as a class object -
+    but find out how and which method is better.
+    IMPORTANT: IN utility functions getstring() is used in several other untility functions which are in turn called in
+    main module checker1.py. That means there is parameter nesting. This is not good.
+    Try remove utility functions to use each other. That possible?
+    Or is there a way to use class/objects to get rid of this duplication/coupling?
 
 OK    - BUG: No_orphan_brackets()
       doesn't pick up: << aaa/>>><, <>< aaa/>>
