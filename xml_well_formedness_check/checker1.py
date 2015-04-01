@@ -3,8 +3,6 @@
     author: Matjaz Pirnovar
     date: Feb-Mar 2015
 
-    - FIX GIT & GITHUB
-    - FIX LAST FUNCTION ERROR DISPLAY - content under the last root tag
     - DEBUG NESTING
     - CHECK IF LATEST FIXES AND LINE NUMBERS ARE WORKING
     - SORT OUT IF STATEMENT ORDER IN run FUNCTION
@@ -130,9 +128,7 @@ def no_redundant_brackets(err, xmlstr, linenum):
 # ****************************************************************************************************
 #   CHECK THAT NUMBER OF < and > IS EVEN
 # ****************************************************************************************************
-
 #  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!! - BUT how to define the affected line?
-
 def number_of_angle_brackets_is_even(err, xmlstr):
     """
     Check that number of angle brackets (<,>) is even.
@@ -428,7 +424,6 @@ def paired_elements_are_closed_properly_and_names_match(err):
             unpaired_tags.remove(item)
 
     # get elements that are unique - that are shown only once (ignoring duplicates)
-    print('UNPAIRED TAGS: ', unpaired_tags)
     # retrieve full tag structures of unpaired tags. So I can check if they are in line numbers lines.
     # Shortened version (ie l vs <    l > may be problematic when finding line number and content.
 
@@ -566,9 +561,7 @@ def is_nesting_proper(err):
 # ****************************************************************************************************
 #   IS NUMBER OF COMMENT TAGS EVEN
 # ****************************************************************************************************
-
 #  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!! HOW? DOESN'T NEED LINE NUMBERS?
-
 def is_number_of_comment_tags_even(err):
     """
     Check if number of commnt tags is even
@@ -663,49 +656,56 @@ def no_restricted_characters_in_content(err):
     # < and > will already be checked by no_redundant_brackets() unless a proper tag is formed
     # (but in that case content data changes into a tag)
     restricted = [ '<', '>', '&' ]
-    restricted_chars = [ char for char in utility.get_data_content() for c in restricted if c in char ]
-    if len(restricted_chars) != 0:
+    restricted_chars_in_tag = [ char for char in utility.get_data_content() for c in restricted if c in char ]
+    if len(restricted_chars_in_tag) != 0:
 
-        print('RESTRICTED CHARS: ', restricted_chars)
-        # get line numbers and line content
-        num, content = 0, ''
-        for tag in restricted_chars:
-            for e in utility.line_numbers:
-                if tag in e[1]:
-                    num, content = e
-                    err.add_msg('no_restricted_characters_in_content',
-                                'Invalid characters (<, >, &) in data content on line: '
-                                + str(num) + ': ' + content.strip())
+        # does list element that contains '&' also has quot; amp; lt; gt; or amp; following it?
+        # if yes, then these '&' are exception. They make escape entities like &quot; etc.
+        allowed_entities = [ '&quot;', '&apos;', '&lt;', '&gt;', '&amp;']
 
-            return False
-    else:
-        return True
+        # if tag with & in it is followed by quot; or apos; or lt; etc - then it's escape entity. Allow it.
+        # in other words, only block & that are not part of escape entities
+        for ind, t in enumerate(restricted_chars_in_tag):
+            s = t.index('&')
+            for allowed in allowed_entities:
+                if t[s:].startswith(allowed):   # these are escape entities. remove them from the list of restricted tags
+                    restricted_chars_in_tag.remove(t)
+                    #print('TAG: ', t[s:].strip(), t.strip() + '  ', allowed)
+
+    # get line numbers and line content
+    num, content = 0, ''
+    for tag in restricted_chars_in_tag:
+        for e in utility.line_numbers:
+            if tag.strip() in e[1]:
+                num, content = e
+                err.add_msg('no_restricted_characters_in_content',
+                            'Invalid characters (<, >, &) in data content on line '
+                            + str(num) + ': ' + content.strip())
 
 
 # ****************************************************************************************************
 #   CHECK THAT THERE IS NOTHING BEFORE AND AFTER THE ROOT TAG
 # ****************************************************************************************************
-
-# FIX DISPLAY!!!!!! AND THEN DONE!
-
 def no_invalid_content_after_root_tag(err, xmlstr):
     """
     And that there is nothing below the ending root tag
     :return: boolean
     """
-
-    print(utility.line_numbers[-1:])
     # check after the ending root tag
     last_char = xmlstr[-1]
     after = xmlstr[-1:]
     if last_char != '>' and after != '':
-        #utility.line_numbers[:-1]
-        err.add_msg('no_invalid_content_after_root_tag',
-                    'Content after the ending root tag is disallowed. Even spaces - please delete them.'
-                    '\nOn line ' + str(utility.line_numbers[-1:][0]) + ': ' + str(utility.line_numbers[-1:]))
-        return False
-    else:
-        return True
+
+        num, content = utility.line_numbers[-1:][0]
+        if content == ' ' or content == '\n' or content == '\t':
+            space = '(empty space)'
+            err.add_msg('no_invalid_content_after_root_tag',
+                        'Content after the ending root tag is disallowed, including empty spaces. Please remove them.'
+                        '\nOn line ' + str(num+1) + ': ' + space)
+        else:
+            err.add_msg('no_invalid_content_after_root_tag',
+                        'Content after the ending root tag is disallowed, including empty spaces. Please remove them.'
+                        '\nOn line ' + str(num) + ': ' + content.strip())
 
 
 

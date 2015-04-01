@@ -7,13 +7,13 @@
         <aaa/>
         <bbb><bbb><bbb>
         <!-- this a test xml file -->
-            <firstname b="12">u&u</firstname>
+            <firstname b="12">uu</firstname>
             <lastname a= " sds">Brown John</lastname>
         <from> hjhj
             <br/>
             <!--  -->
             Jani <l    j >
-            <ffff/>
+            <ffff/>&&&kk&amp;
         </from>
         <frommm     >
 
@@ -29,14 +29,13 @@
         <img>
             <a2>
                 <from >
-                    <from>u&u</from>
+                    <from>u&amp;u</from>
                 </from>
-            </a2>
+            </a2>wwwwww&
         </img>
-    </a1>
+    </a1>eeee &gt;&
 
        <heading>Reminder</heading>
     <body id="">Don't forget me this weekend!
-</body>
+</body> kk
 </note>
-ccc
