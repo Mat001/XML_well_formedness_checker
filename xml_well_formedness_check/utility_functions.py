@@ -29,7 +29,6 @@ class Utility():
 
         """
             Get xml file as a string.
-            :return: string
         """
         logging.basicConfig(level=logging.DEBUG)
         try:
@@ -148,6 +147,7 @@ class Utility():
         split = [ tag.split() for tag in no_slash ]
         #print('split: ', split)
 
+        # remove brackets
         tags = []
         for part in split:
             if not part[0] == '<':
@@ -288,8 +288,5 @@ class Utility():
 
 # instantiate Utility class object
 utility = Utility('/home/matjaz/PycharmProjects/xml_well_formedness_check/'
-                  'xml_well_formedness_check/xml_example.txt')
+                  'xml_well_formedness_check/xml_2.txt')
 
-#print(utility.xml_string)
-#print(utility.line_numbers)
-#print('ALL TAGS IN ORDER:', utility.get_all_tags_in_order())

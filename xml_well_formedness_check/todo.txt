@@ -3,6 +3,17 @@ TO DO:
 
     - IMPORTANT:
 
+    - BUG - paired elements close properly
+      <note>
+        <a1 id="123"><ddd></ddd>
+            <a1>
+            <b1></as><as>   - DOESN'T SEE THIS WRONG ORDER
+            </b1>
+            </b1></b1></b1><sss></sss></b1>  - DOESN'T SEE SEVERAL </b1> tags - NOW FIXED
+        </a1></a1><mmm></mmm>
+      </note>
+
+
     - HOW TO ADD LINE NUMBER TO WARNINGS for functions 'no of tags not even', 'tags don't match'?
         - first option: function even tags has exception that allows further funcion checks until the point
         where linenumber can be pinpointed.

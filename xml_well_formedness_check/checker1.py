@@ -37,7 +37,7 @@ class ErrorLog():
 err = ErrorLog()
 
 # ****************************************************************************************************
-#   CHECK THAT DOCUMENT DOESN'T HAVE EXTRA-ORPHAN BRACKETS
+ #   CHECK THAT DOCUMENT DOESN'T HAVE EXTRA-ORPHAN BRACKETS
 # ****************************************************************************************************
 def no_redundant_brackets(err, xmlstr, linenum):
     """
@@ -410,51 +410,184 @@ def paired_elements_are_closed_properly_and_names_match(err):
     Check that paired elements (not single ones) are closed properly.
     Based on the fact that number of < must match number of </.
     If it doesn't, then either < or </ are mis-formatted or are missing.
+
+        # ALL SCENARIOS THAT I NEED TO DO
+
+    # 1. SET OF OPENING TAGS (IT'S A SET - A SINGLE REPRESENTATION OF EACH TAG, NOT CORRECT NU OF OCCURENCES) - DONE
+
+    # 2. SET OF CLOSING TAGS (IT'S A SET - A SINGLE REPRESENTATION OF EACH TAG, NOT CORRECT NU OF OCCURENCES) - DONE
+
+    # 3. CLOSING TAGS ARE BEFORE OPENING TAGS - DONE (flags an error as soon as there is closing tag before opening one)
+    # BUG:
+    # deals with:
+    # </b1></b1></b1><b1><b1><b1><b1>
+    # but not with when in rows:
+    # </b1>
+    # </b1>
+    # </b1>
+    # <b1>
+    # <b1>
+    # <b1>
+    # <b1>
+    # Flags all opening tags as erroneous. It's something about when tags are in separate rows, not all in one line (strip?).
+
+    # 3 - 8 ARE ALL FOR CASE OF MULTIPLE TAGS WITH THE SAME NAME
+    # 4. ALL OPENING TAGS ARE BEFORE ALL CLOSING TAGS - DONE
+    # AND MORE CLOSING TAGS THAN OPENING TAGS (ex.<b1><b1><b1></b1></b1></b1></b1> )
+    # - BUG: Deals with:
+    # <b1><b1>
+    # </b1></b1></b1></b1></b1></b1>
+    # but not with (new line. neews stripping??):
+    # <b1><b1>
+    # </b1>
+    # </b1>
+    # </b1></b1></b1></b1>
+
+    # 5. ALL OPENING TAGS BEFORE CLOSING TAGS - DONE
+    # AND MORE OPENING TAGS THAN CLOSING TAGS (ex.<b1><b1><b1><b1></b1></b1></b1> )
+    # BUG - same as in 3 (problem when in rows)
+
+    # 6. ALL CLOSING TAGS ARE BEFORE ALL OPENING TAGS - DONE (taken care of by 4)
+    # AND MORE CLOSING TAGS THAN OPENING TAGS (example: </b1></b1></b1></b1></b1><b1><b1>)
+
+
+    # 7. SOME OPENING TAGS ARE BEFORE SOME CLOSING TAGS
+    # AND MORE CLOSING TAGS THAN OPENING TAGS (ex.<b1></b1><b1>  </b1></b1></b1></b1> )
+
+    # 8. SOME CLOSING TAGS ARE BEFORE SOME OPENING TAGS - taken care of by 4
+    # AND MORE OPENING TAGS THAN CLOSING TAGS (example: </b1><b1></b1><b1><b1><b1><b1>)
+
+    # 9. IN A SINGLE TAG PAIR PROGRAM NEEDS TO RECOGNIZE WHEN CLOSING TAG IS AFTER OR BEFORE OPENING TAG - DONE by 4
+    # AND FLAG IF IT'S INCORRECT (must be <b1></b1>)
+    # - BUG: same as in 6.
+
     :return: boolean
     """
-    # start by getting clean tags
-    clean = utility.get_clean_tags()
+    # clean up tags from scratch and remove single elements
+    tags = utility.remove_declaration_doctype_comments()
 
-    # add unpaired items to a list
-    unpaired_tags = []
-    for item in clean:
-        if item not in unpaired_tags:
-            unpaired_tags.append(item)
-        elif item in unpaired_tags:
-            unpaired_tags.remove(item)
+    without_singles = [tag for tag in tags if '/>' not in tag]
+    #print('WITHOUT SINGLES: ', without_singles, len(without_singles))
 
-    # get elements that are unique - that are shown only once (ignoring duplicates)
-    # retrieve full tag structures of unpaired tags. So I can check if they are in line numbers lines.
-    # Shortened version (ie l vs <    l > may be problematic when finding line number and content.
+    # get tags with slashes
+    no_singles_short = [i.split()[0] for i in without_singles]
 
-    # make list of tuples: (index of a tag, tag name)
-    numbered=[]
-    l1 = [ (ind, tag) for ind, tag in enumerate(clean) ]
-    for i in l1:
-        for t in unpaired_tags:
-            if t == i[1]:
-                numbered.append(i)
+    # use now singles short list for further analysis
+    # get rid of brackets
+    no_brackets=[]
+    for tag in no_singles_short:
+        tag = tag.strip('<')
+        tag = tag.strip('>')
+        no_brackets.append(tag)
 
-    # et tuples of index and tag for full tags in order without comments
-    all_tags = [ (ind, tag) for ind, tag in enumerate(utility.remove_declaration_doctype_comments()) ]
+    no_brackets_enumerated = [ (ind, tag) for ind, tag in enumerate(no_brackets) ]
+    #print('NO BRACKETS ENUMERATED: ', no_brackets_enumerated, len(no_brackets_enumerated))
 
-    # get full tags by intersecting indexes of all tags and numbered
-    full_tags =[]
-    for n in numbered:
-        for a in all_tags:
-            if n[0] == a[0]:
-                full_tags.append(a[1])
+    # Generate sets of unique opening and closing tags
+    opening = set([t for t in no_brackets if not t.startswith("/")])
+    closing = set([t for t in no_brackets if t.startswith("/")])
+    #print('OPENING: ', opening)
+    #print('CLOSING: ', closing)
 
-    # get line number and content from full tags
-    num, content = 0, ''
-    for tag in full_tags:
+    # map list of 'unpaired' to list 'without singles'
+    z = zip(without_singles, no_brackets)
+    z = list (z)
+    #print('Z: ', z)
+
+
+    # ==========================================================
+    #   TESTS on MATCHING TAGS AND ORDER OF OPENING/CLOSING TAGS
+    # ==========================================================
+
+    # Get unpaired tags by specifing different criteris:
+    # For example:
+    # 1. <xxx> -> </xxx> and <xxx> not in closing? === gives unpaired opening tags
+    unpair_op = [ t for t in no_brackets if "/" + t not in closing and t not in closing ]
+    # change into full tags
+    unpair_op_full_tags = [t[0] for t in z if t[1] in unpair_op]
+
+    # 2. </yyy> -> </yyy> in closing? AND <yyy> not in opening?  === unpaired closing tags
+    unpair_cl = [ t for t in no_brackets if t in closing and t[1:] not in opening
+                  and no_brackets.count(t) > no_brackets.count(t[1:]) ]
+    # change into full tags
+    unpair_cl_full_tags = [t[0] for t in z if t[1] in unpair_cl]
+
+
+    # 3. CLOSING TAG(S) ARE BEFORE OPENING TAGS
+    unpair_op_2, unpair_cl_2, unpaired_mix = [], [], []
+    diff1, diff2 = 0, 0
+    for t in no_brackets:
+        # if tag in 'opening' list
+        # there are more closing tags than opening ones
+        # closing tags are BEFORE opening tags
+        if t in opening and '/' + t in closing:
+            if no_brackets.index('/' + t) < no_brackets.index(t):
+                unpair_op_2.append('/' + t)  # add closing tags that are before opening tags to the list
+
+    # here enclose test No 4 into if statement that first checks that there are no
+    # sinle closing tags before opening tags. Helps in clarity.
+    if len(unpair_op_2) == 0:
+
+        # 4. ALL OPENING TAGS ARE BEFORE ALL CLOSING TAGS
+        # AND MORE CLOSING TAGS THAN OPENING TAGS (ex.<b1><b1><b1></b1></b1></b1></b1> )
+        for t in no_brackets:
+            if t in closing and t[1:] in opening and no_brackets.count(t) > no_brackets.count(t[1:]):
+                diff1 = no_brackets.count(t) - no_brackets.count(t[1:])
+                unpair_cl_2.append(t)
+
+        # 5. A MIX OF OPENING AND CLOSING TAGS
+        # FIRST OPENING< THEN CLOSING< THEN ONE OR MORE OPENING
+        no_br_reversed = [i for i in reversed(no_brackets)]
+
+        for t in no_brackets:
+            if t in opening and '/'+t in closing \
+                and no_brackets.index(t) < no_brackets.index('/'+t) \
+                and no_brackets.count(t) > no_brackets.count('/'+t):
+                # get opening tag after the last closing tag
+                diff2 = no_brackets.count(t) - no_brackets.count('/'+t)
+                if no_br_reversed.index(t):
+                    unpaired_mix.append(t)
+
+
+    # CONVERT INTO FULL TAGS
+    # FOR case 3: change into full tags for later use for line numbers
+    unpair_op_2_full_tags = [t[0] for t in z if t[1] in unpair_op_2]
+
+    # FOR case 4: change into full tags for later use for line numbers
+    unpair_cl_2_full_tags = [t[0] for t in z if t[1] in unpair_cl_2]
+    # take only closing tags that don't have previous opening tag (hence ...[:diff])
+    unpair_cl_2_full_tags = unpair_cl_2_full_tags[:diff1]
+
+    # FOR case 5: change into full tags
+    unpaired_mix_full_tags = [t[0] for t in z if t[1] in unpaired_mix]
+    unpaired_mix_full_tags = unpaired_mix_full_tags[:diff2]
+
+
+    # ADD TOGETHER ALL UNPAIRED TAGS - IN FULL TAG FORM
+    unpaired_full_tags = unpair_op_full_tags + unpair_cl_full_tags + unpair_op_2_full_tags + unpair_cl_2_full_tags \
+                        + unpaired_mix_full_tags
+
+    # Debugging print statements:
+    #print('NO_BRACKETS: ', no_brackets)
+    #print('UNPAIRED_TAGS_OP: ', unpair_op)
+    #print('UNPAIRED_TAGS_CL: ', unpair_cl)
+    #print('UNPAIRED_TAGS_OP2_FULL_TAGS: ', unpair_op_2_full_tags)
+    #print('UNPAIRED_TAGS_CL2_FULL_TAGS: ', unpair_cl_2_full_tags)
+    print('UNPAIRED MIX FULL T: ', unpaired_mix_full_tags)
+    print('UNPAIRED FULL TAGS: ', unpaired_full_tags)
+
+    # generate error messages with line numbers and line content
+    for tag in unpaired_full_tags:
         for e in utility.line_numbers:
             if tag in e[1]:
                 num, content = e
                 # move err.add_msg block into outer for loop scope
                 # if you want to display one error message at the time, instead of all of them
-                err.add_msg('paired_elements_are_closed_properly_and_names_match. ',
-                            'Tag \'' + tag + '\' doesn\'t have a match. On line ' + str(num) + ': ' + content.strip())
+                err.add_msg('paired_elements_are_closed_properly_and_names_match',
+                            'Tag \'' + tag + '\' doesn\'t have a match or it is placed before the opening tag.\n'
+                            'On line ' + str(num) + ': ' + content.strip())
+        return False    # boolean False allows incrementl addressing of misformed tags
+    return True
 
 
 # ****************************************************************************************************
@@ -482,7 +615,6 @@ def all_lowercase_tags(err, tags_order):
             return False
 
         if not tag.islower() and tag[1] != '?' and tag[1] != '!':
-
             # get line numbers and line content
             num, content = 0, ''
             for e in utility.line_numbers:
@@ -637,6 +769,10 @@ def single_element_is_correctly_formed_case_without_attribute(err):
 # ****************************************************************************************************
 #   CHECK THAT NO RESTRICTED CHARACTERS ARE PRESENT IN DATA CONTENT
 # ****************************************************************************************************
+
+# DEBUG SO IT PICKS UP SECOND, THIRD ETC AMPERSAND IN THE TAG.
+# AT THE MOMENT find() METHOD ONLY FINDS THE FIRST AMPERSAND IN THE TAG< OTHERS GO THROUGH!!
+
 def no_restricted_characters_in_content(err):
     """
     TO SIMPLIFY, LIMIT RESTRICTED CHARS TO: <,>,&
@@ -665,12 +801,14 @@ def no_restricted_characters_in_content(err):
 
         # if tag with & in it is followed by quot; or apos; or lt; etc - then it's escape entity. Allow it.
         # in other words, only block & that are not part of escape entities
+        start = 0
         for ind, t in enumerate(restricted_chars_in_tag):
-            s = t.index('&')
+            s = t.find('&', start)  # problem - finds only FIRST ampersand, not also second, third etc. if any
             for allowed in allowed_entities:
                 if t[s:].startswith(allowed):   # these are escape entities. remove them from the list of restricted tags
                     restricted_chars_in_tag.remove(t)
                     #print('TAG: ', t[s:].strip(), t.strip() + '  ', allowed)
+                    start = s
 
     # get line numbers and line content
     num, content = 0, ''
@@ -754,15 +892,15 @@ def run():
         root_tags_match(err)
         element_names_contain_only_valid_characters(err)
         closing_tag_must_start_with_forward_slash(err)
-        paired_elements_are_closed_properly_and_names_match(err)
         #single_element_is_correctly_formed_case_without_attribute(err)
         all_lowercase_tags(err, tags_order=utility.get_all_tags_in_order())
-        is_nesting_proper(err)
         is_number_of_comment_tags_even(err)
         #is_comment_opening_tag_followed_by_closing_tag(err)
         comment_closing_tags_dont_have_extra_dash(err, xmlstr=utility.xml_string)
         no_restricted_characters_in_content(err)
         no_invalid_content_after_root_tag(err, xmlstr=utility.xml_string)
+        paired_elements_are_closed_properly_and_names_match(err)
+        is_nesting_proper(err)
 
 
 # run the program

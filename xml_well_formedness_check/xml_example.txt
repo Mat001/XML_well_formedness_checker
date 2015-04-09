@@ -5,37 +5,35 @@
     <!-- hahaha -->
     <to b = "111"> <aaa/>
         <aaa/>
-        <bbb><bbb><bbb>
+        <bbb><bbb></bbb>
         <!-- this a test xml file -->
             <firstname b="12">uu</firstname>
             <lastname a= " sds">Brown John</lastname>
         <from> hjhj
-            <br/>
+            <br/><br/>
+
+            <hello><hello><hello><hello><hello>
+
             <!--  -->
             Jani <l    j >
-            <ffff/>&&&kk&amp;
+            <ffff/>
         </from>
-        <frommm     >
-
-            Matjaz
-        </from><war/><war><sss/>
     </to>
-    <!-- this a test xml file ----->
-    <br/><    elephant> <   ll >
-    <from />
-    <img><img>
+    <!-- this a test xml file -->
+    <br/><elephant> <ll >
+    <from/>
     <from>category1 | category2 | category3</from>
     <a1>
         <img>
             <a2>
                 <from >
-                    <from>u&amp;u</from>
+                    <from>uu&amp;uuuuu&kkk</from>
                 </from>
-            </a2>wwwwww&
+            </a2>
         </img>
-    </a1>eeee &gt;&
+    </a1>eeee
 
        <heading>Reminder</heading>
     <body id="">Don't forget me this weekend!
-</body> kk
+</body> kk<yaya><frfrf>
 </note>
