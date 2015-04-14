@@ -1,9 +1,35 @@
 TO DO:
     FIX functions:
 
-    - IMPORTANT:
+    - BUG: <xxx/ > - space not cleaned up! Or it is cleaned up, but wrong tag displayed by code block
+      for displaying line numbers.
+      Example:
+      From element_names_contain_only_valid_characters:
+        Element name contains invalid character (allowed are letters, digits, _, :, ., -). On line 20: <vt:br/>
+        What is really meant is incorrect space in tag <vt:br/ > on line 11: <vt:br /><vt:br/ >. But it picked up
+        tag on line 20! I tried to make sure that spaces in closing tags are removed first, but function that does that
+        only does that for paired tags, not singles!!!! element_names_contain_only_valid_characters really should take
+        care of, but that's where the error occurs.
 
-    - BUG - paired elements close properly
+    - program works only when functions in a long if statement. If no if statement, then functions return duplicate results
+    because same checks are used in different functions. Benefit is that all errors are shown in one list (nice!) versus
+    error by error. Is it worth it? Is eliminating duplicates doable without breaking the rest? If I do that, will I still
+    need to put functions in order?
+     Remember there is dependency in some functions like get_all_tags_in_order that ALL ANGLE BRACKETS ARE PRESENT, and no extra ones.
+     So the function that checks for all angle brackets must pass before get_all_angle_brackets.
+     Check if there are any other dependencies like this one!
+
+    - NICE TO HAVE:
+      Can I redesign Utility class initializer to only read file once (not for xml string and for line numbers separately)?
+      For example making it give an option to return an xml string or file with line numbers (as boolean flag in arg list?)
+      But - initializer is not suppose to return anything!!!!
+
+    - NICE TO HAVE: Using print('Invalid character on line {}: {}' .format(linenu, content)) method
+      in error messages in functions (instead of concatenation)
+
+##############################################################
+
+OK  - BUG - paired elements close properly
       <note>
         <a1 id="123"><ddd></ddd>
             <a1>
@@ -13,8 +39,8 @@ TO DO:
         </a1></a1><mmm></mmm>
       </note>
 
-
-    - HOW TO ADD LINE NUMBER TO WARNINGS for functions 'no of tags not even', 'tags don't match'?
+OK (no need for linenumbers here)    - HOW TO ADD LINE NUMBER TO WARNINGS for functions 'no of tags not even',
+        'tags don't match'?
         - first option: function even tags has exception that allows further funcion checks until the point
         where linenumber can be pinpointed.
         The problem with this is that get_all_tags_in_order() requires even and matching brackets.
@@ -23,7 +49,13 @@ TO DO:
         - second: apply errorLog class and see if you can use line numbers there
         COMMENT: TWO OPENING or CLOSING BRACKETS CAN't BE ONE RIGHT AFTER THE OTHER?
 
-    - BUG (SEVERE): not recognizing nesting
+OK (temporarily allowed restricted chars (&) in content) - BUG: no_restricted_characters_in_content function
+     duplicates error message if same data content with same invalid character exists. For example:
+     <firstname b="12">u&u</firstname> on line 10 and
+     <from>u&u</from> on line 32
+     As solution I could use return False at the end of if statement to show one error message at the time
+
+OK  - BUG (SEVERE): not recognizing nesting
     Doesn't pick up two consecutive <img><img> tags or </img></img>.
     Seems the bug comes up when even number of tags but have opening or both have closing tag.
     Snippet from within the root element:
@@ -43,31 +75,8 @@ TO DO:
     Make sure that there is a check that checks whether </img><img> is in incorrect order (while checking
     for nesting or as separete check) - should function paired_elements_are_closed_properly_and_names_match do that ()?
 
-    - BUG: no_restricted_characters_in_content function duplicates error message if same data content with
-    same invalid character exists. For example:
-     <firstname b="12">u&u</firstname> on line 10 and
-     <from>u&u</from> on line 32
-     As solution I could use return False at the end of if statement to show one error message at the time
-
-    - program works only when functions in a long if statement. If no if statement, then functions return duplicate results
-    because same checks are used in different functions. Benefit is that all errors are shown in one list (nice!) versus
-    error by error. Is it worth it? Is eliminating duplicates doable without breaking the rest? If I do that, will I still
-    need to put functions in order?
-     Remember there is dependency in some functions like get_all_tags_in_order that ALL ANGLE BRACKETS ARE PRESENT, and no extra ones.
-     So the function that checks for all angle brackets must pass before get_all_angle_brackets.
-     Check if there are any other dependencies like this one!!
-
-    - if I add <img ><img> to the xml file, the warning says The following opening tag names don't have a match:  ['<img>']
+OK  if I add <img ><img> to the xml file, the warning says The following opening tag names don't have a match:  ['<img>']
     Why only the second tag name??? Should list both opening tags. - NOT A HUGE ISSUE
-
-    - NICE TO HAVE:
-      Can I redesign Utility class initializer to only read file once (not for xml string and for line numbers separately)?
-      For example making it give an option to return an xml string or file with line numbers (as boolean flag in arg list?)
-      But - initializer is not suppose to return anything!!!!
-
-    - NICE TO HAVE: Using print('Invalid character on line {}: {}' .format(linenu, content)) method in error messages in functions (instead of concatenation)
-
-##############################################################
 
 OK  - BUG: function paired_elements_are_closed_properly_and_names_match() doesn't correctly recognize
     multiple same tags: <bbb><bbb><bbb>

@@ -7,8 +7,6 @@
     - CHECK IF LATEST FIXES AND LINE NUMBERS ARE WORKING
     - SORT OUT IF STATEMENT ORDER IN run FUNCTION
     - DEBUG THE REST OF THE BUGS
-    - get_all_tags_in_order() function blows up when brackets are out of place or extra/missing!
-    (fixed by checking brackets first by functions: no_redundant_brackets, no_of_brackets_even, matching_brackets)
 """
 
 from xml_well_formedness_check.utility_functions import utility
@@ -387,8 +385,7 @@ def element_names_contain_only_valid_characters(err):
     # if anything else but letters, digits, hyphens, underscores, colons or full stops in names return false
     #p = re.compile('[ A-Za-z0-9_:.-]*$')
     for name in names:
-        if not re.match(r'[ A-Za-z0-9_:.-]*$', name):
-
+        if not re.match(r'[ A-Za-z0-9_:.-]*$', name.strip()):
             # get line numbers and line content
             num, content = 0, ''
             for e in utility.line_numbers:
@@ -573,8 +570,8 @@ def paired_elements_are_closed_properly_and_names_match(err):
     #print('UNPAIRED_TAGS_CL: ', unpair_cl)
     #print('UNPAIRED_TAGS_OP2_FULL_TAGS: ', unpair_op_2_full_tags)
     #print('UNPAIRED_TAGS_CL2_FULL_TAGS: ', unpair_cl_2_full_tags)
-    print('UNPAIRED MIX FULL T: ', unpaired_mix_full_tags)
-    print('UNPAIRED FULL TAGS: ', unpaired_full_tags)
+    #print('UNPAIRED MIX FULL T: ', unpaired_mix_full_tags)
+    #print('UNPAIRED FULL TAGS: ', unpaired_full_tags)
 
     # generate error messages with line numbers and line content
     for tag in unpaired_full_tags:
@@ -586,7 +583,7 @@ def paired_elements_are_closed_properly_and_names_match(err):
                 err.add_msg('paired_elements_are_closed_properly_and_names_match',
                             'Tag \'' + tag + '\' doesn\'t have a match or it is placed before the opening tag.\n'
                             'On line ' + str(num) + ': ' + content.strip())
-        return False    # boolean False allows incrementl addressing of misformed tags
+        return False    # boolean False allows incremental addressing of misformed tags
     return True
 
 
@@ -793,6 +790,9 @@ def no_restricted_characters_in_content(err):
     # (but in that case content data changes into a tag)
     restricted = [ '<', '>', '&' ]
     restricted_chars_in_tag = [ char for char in utility.get_data_content() for c in restricted if c in char ]
+
+    restricted_chars_in_tag = [ t.replace('\n', '').strip() for t in restricted_chars_in_tag ]
+
     if len(restricted_chars_in_tag) != 0:
 
         # does list element that contains '&' also has quot; amp; lt; gt; or amp; following it?
@@ -800,25 +800,64 @@ def no_restricted_characters_in_content(err):
         allowed_entities = [ '&quot;', '&apos;', '&lt;', '&gt;', '&amp;']
 
         # if tag with & in it is followed by quot; or apos; or lt; etc - then it's escape entity. Allow it.
-        # in other words, only block & that are not part of escape entities
-        start = 0
-        for ind, t in enumerate(restricted_chars_in_tag):
-            s = t.find('&', start)  # problem - finds only FIRST ampersand, not also second, third etc. if any
-            for allowed in allowed_entities:
-                if t[s:].startswith(allowed):   # these are escape entities. remove them from the list of restricted tags
-                    restricted_chars_in_tag.remove(t)
-                    #print('TAG: ', t[s:].strip(), t.strip() + '  ', allowed)
-                    start = s
+        # in other words, only get & that are not part of escape entities
+        for t in restricted_chars_in_tag:
+            for allow in allowed_entities:
+                # WITH ENITIES IN TAG
+                if allow in t:
+                    t = t.replace(allow, '')
+                    # with spaces
+                    if ' ' in t:
+                        l = t.split()
+                        for i in l:
+                            if '&' in i:
+                                # get line numbers and line content
+                                num, content = 0, ''
+                                # for tag in restricted_chars_in_tag:
+                                for e in utility.line_numbers:
+                                    #print(t.strip(), e[1])
+                                    if i.strip() in e[1]:
+                                        num, content = e
+                                        err.add_msg('no_restricted_characters_in_content',
+                                                    'Invalid characters (<, >, &) in data content on line '
+                                                    + str(num) + ': ' + content.strip())
+                    # without spaces
+                    else:
+                        for e in utility.line_numbers:
+                            # print(t.strip(), e[1])
+                            if t.strip() in e[1]:
+                                num, content = e
+                                err.add_msg('no_restricted_characters_in_content',
+                                            'Invalid characters (<, >, &) in data content on line '
+                                            + str(num) + ': ' + content.strip())
+                # WITHOUT ENTITIES IN TAG
+                else:
+                    print('KK: ', t)
+                    # with spaces
+                    if ' ' in t:
+                        l = t.split()
+                        for i in l:
+                            if '&' in i:
+                                # get line numbers and line content
+                                num, content = 0, ''
+                                # for tag in restricted_chars_in_tag:
+                                for e in utility.line_numbers:
+                                    # print(t.strip(), e[1])
+                                    if i.strip() in e[1]:
+                                        num, content = e
+                                        err.add_msg('no_restricted_characters_in_content',
+                                                    'Invalid characters (<, >, &) in data content on line '
+                                                    + str(num) + ': ' + content.strip())
+                    else:
+                        # without spaces
+                        for e in utility.line_numbers:
+                            # print(t.strip(), e[1])
+                            if t.strip() in e[1]:
+                                num, content = e
+                                err.add_msg('no_restricted_characters_in_content',
+                                            'Invalid characters (<, >, &) in data content on line '
+                                            + str(num) + ': ' + content.strip())
 
-    # get line numbers and line content
-    num, content = 0, ''
-    for tag in restricted_chars_in_tag:
-        for e in utility.line_numbers:
-            if tag.strip() in e[1]:
-                num, content = e
-                err.add_msg('no_restricted_characters_in_content',
-                            'Invalid characters (<, >, &) in data content on line '
-                            + str(num) + ': ' + content.strip())
 
 
 # ****************************************************************************************************
@@ -858,17 +897,6 @@ def no_invalid_content_after_root_tag(err, xmlstr):
 #print('    UTILITIES')
 #print('**********************************************************************************')
 
-# UTILITIES
-#print('All tags in order: ', get_all_tags_in_order())
-#print('Clean tags: ', get_clean_tags())
-#print('Duplicate tags: ', find_duplicate_tags())
-#print('Root element: ', get_root_element())
-#print('Get comment opening tag positions: ', get_opening_comment_tag_positions())
-#print('Get comment closing tag positions: ', get_closing_comment_tag_positions())
-#print('Number of all tags (without declar, doctype, commen): ', get_number_of_all_tags_excluding_declar_doctype_comments())
-#print('Get single elements: ', get_single_elements())
-#print('Get data content: ', get_data_content())
-
 print('**********************************************************************************')
 print('    CHECKS')
 print('**********************************************************************************')
@@ -886,8 +914,8 @@ def run():
        number_of_angle_brackets_is_even(err, xmlstr=utility.xml_string) and \
        number_of_opening_and_closing_brackets_match(err, xmlstr=utility.xml_string):
 
-        no_invalid_initial_characters_in_opening_tag(err, tags_order=utility.get_all_tags_in_order())
         no_spaces_or_attributes_in_closing_tags(err, tags_order=utility.get_all_tags_in_order())
+        no_invalid_initial_characters_in_opening_tag(err, tags_order=utility.get_all_tags_in_order())
         starts_with_xml_declaration(err, xmlstr=utility.xml_string, linenum=utility.line_numbers)
         root_tags_match(err)
         element_names_contain_only_valid_characters(err)
@@ -897,11 +925,12 @@ def run():
         is_number_of_comment_tags_even(err)
         #is_comment_opening_tag_followed_by_closing_tag(err)
         comment_closing_tags_dont_have_extra_dash(err, xmlstr=utility.xml_string)
-        no_restricted_characters_in_content(err)
+        #no_restricted_characters_in_content(err)
         no_invalid_content_after_root_tag(err, xmlstr=utility.xml_string)
-        paired_elements_are_closed_properly_and_names_match(err)
-        is_nesting_proper(err)
+        if paired_elements_are_closed_properly_and_names_match(err):
+            is_nesting_proper(err)
 
+# DO IF STATEMENTS ! CLEARER!
 
 # run the program
 run()

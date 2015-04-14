@@ -288,5 +288,5 @@ class Utility():
 
 # instantiate Utility class object
 utility = Utility('/home/matjaz/PycharmProjects/xml_well_formedness_check/'
-                  'xml_well_formedness_check/xml_2.txt')
+                  'xml_well_formedness_check/xml_example.txt')
 

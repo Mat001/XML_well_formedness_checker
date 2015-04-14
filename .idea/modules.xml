@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../MS_project_parser_comparison/.idea/MS_project_parser_comparison.iml" filepath="$PROJECT_DIR$/../MS_project_parser_comparison/.idea/MS_project_parser_comparison.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../simple_program/.idea/simple_program.iml" filepath="$PROJECT_DIR$/../simple_program/.idea/simple_program.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/xml_well_formedness_check.iml" filepath="$PROJECT_DIR$/.idea/xml_well_formedness_check.iml" />
     </modules>
   </component>

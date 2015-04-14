@@ -4,6 +4,8 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="jdk" jdkName="Python 3.4.0 (/usr/bin/python3.4)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="simple_program" />
+    <orderEntry type="module" module-name="MS_project_parser_comparison" />
   </component>
   <component name="PackageRequirementsSettings">
     <option name="requirementsPath" value="" />

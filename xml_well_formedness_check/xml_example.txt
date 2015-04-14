@@ -1,39 +1,40 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>ooo
-<!DOCTYPE greeting SYSTEM "hello.dtd">ddd
-
-<note   &id=''>fff
+<?xml>
+<vt:note   &id=''>
     <!-- hahaha -->
-    <to b = "111"> <aaa/>
-        <aaa/>
-        <bbb><bbb></bbb>
+    <vt:to b = "111"> <vt:aaa/>
+        <vt:aaa></vt:aaa>
+        <vt:bbb><vt: /bbb>
         <!-- this a test xml file -->
-            <firstname b="12">uu</firstname>
-            <lastname a= " sds">Brown John</lastname>
-        <from> hjhj
-            <br/><br/>
+            <vt:firstname b="12">u&u</vt:firstname>
+            <vt:lastname a= " sds">Brown John</vt:lastname>
+        <vt:from> hjhj
+            <vt:br /><vt:br/ >
 
-            <hello><hello><hello><hello><hello>
+            <vt:hello></vt:hello><vt:hello></vt:hello>
 
-            <!--  -->
-            Jani <l    j >
-            <ffff/>
-        </from>
-    </to>
+            <!--  --->
+            Jani
+        </vt:from>
+    </vt:to>
     <!-- this a test xml file -->
-    <br/><elephant> <ll >
-    <from/>
-    <from>category1 | category2 | category3</from>
-    <a1>
-        <img>
-            <a2>
-                <from >
-                    <from>uu&amp;uuuuu&kkk</from>
-                </from>
-            </a2>
-        </img>
-    </a1>eeee
+    <vt:br/>
+    <vt:from/>
+    <vt:from>category1 | category2 | category3</vt:from>
+    <vt:a1>
+        <vt:img>
+            <vt:a2>
+                <vt:from >
+                    <vt:from>
+                    rr
+                    uu&amp;uuuuu&kkk</vt:from>
+                </vt:from>
+            </vt:a2>
+        </vt:img>
+        aaabbbccc&&ddd
+    </vt:a1>eeee
 
-       <heading>Reminder</heading>
-    <body id="">Don't forget me this weekend!
-</body> kk<yaya><frfrf>
-</note>
+    hahaha&&
+       <vt:heading>Reminder</vt:heading>
+    <vt:body id="">Don't forget me this weekend!
+</vt:body> kk
+</vt:note>
