@@ -6,6 +6,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="simple_program" />
     <orderEntry type="module" module-name="MS_project_parser_comparison" />
+    <orderEntry type="module" module-name="MS_project_parser_comparison" />
+    <orderEntry type="module" module-name="MS_project_parser_comparison" />
   </component>
   <component name="PackageRequirementsSettings">
     <option name="requirementsPath" value="" />

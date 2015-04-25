@@ -287,6 +287,6 @@ class Utility():
         return len(without_declarations_and_comments)
 
 # instantiate Utility class object
-utility = Utility('/home/matjaz/PycharmProjects/xml_well_formedness_check/'
+utility = Utility('/home/matjaz/PycharmProjects/XML_well_formedness_checker/'
                   'xml_well_formedness_check/xml_example.txt')
 
