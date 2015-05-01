@@ -2,5 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../MS_project_parser_comparison" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../noisebridge" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../simple_program" vcs="Git" />
   </component>
 </project>

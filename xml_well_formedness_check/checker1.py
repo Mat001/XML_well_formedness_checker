@@ -14,7 +14,8 @@ import re
 
 """
 Class that simplifies displaying warning messages.
-~"""
+"""
+
 
 class ErrorLog():
 
@@ -35,7 +36,7 @@ class ErrorLog():
 err = ErrorLog()
 
 # ****************************************************************************************************
- #   CHECK THAT DOCUMENT DOESN'T HAVE EXTRA-ORPHAN BRACKETS
+# CHECK THAT DOCUMENT DOESN'T HAVE EXTRA-ORPHAN BRACKETS
 # ****************************************************************************************************
 def no_redundant_brackets(err, xmlstr, linenum):
     """
@@ -464,7 +465,7 @@ def paired_elements_are_closed_properly_and_names_match(err):
     tags = utility.remove_declaration_doctype_comments()
 
     without_singles = [tag for tag in tags if '/>' not in tag]
-    #print('WITHOUT SINGLES: ', without_singles, len(without_singles))
+    # print('WITHOUT SINGLES: ', without_singles, len(without_singles))
 
     # get tags with slashes
     no_singles_short = [i.split()[0] for i in without_singles]
@@ -478,18 +479,18 @@ def paired_elements_are_closed_properly_and_names_match(err):
         no_brackets.append(tag)
 
     no_brackets_enumerated = [ (ind, tag) for ind, tag in enumerate(no_brackets) ]
-    #print('NO BRACKETS ENUMERATED: ', no_brackets_enumerated, len(no_brackets_enumerated))
+    # print('NO BRACKETS ENUMERATED: ', no_brackets_enumerated, len(no_brackets_enumerated))
 
     # Generate sets of unique opening and closing tags
     opening = set([t for t in no_brackets if not t.startswith("/")])
     closing = set([t for t in no_brackets if t.startswith("/")])
-    #print('OPENING: ', opening)
-    #print('CLOSING: ', closing)
+    # print('OPENING: ', opening)
+    # print('CLOSING: ', closing)
 
     # map list of 'unpaired' to list 'without singles'
     z = zip(without_singles, no_brackets)
     z = list (z)
-    #print('Z: ', z)
+    # print('Z: ', z)
 
 
     # ==========================================================
@@ -522,7 +523,7 @@ def paired_elements_are_closed_properly_and_names_match(err):
                 unpair_op_2.append('/' + t)  # add closing tags that are before opening tags to the list
 
     # here enclose test No 4 into if statement that first checks that there are no
-    # sinle closing tags before opening tags. Helps in clarity.
+    # single closing tags before opening tags. Helps in clarity.
     if len(unpair_op_2) == 0:
 
         # 4. ALL OPENING TAGS ARE BEFORE ALL CLOSING TAGS
@@ -565,13 +566,13 @@ def paired_elements_are_closed_properly_and_names_match(err):
                         + unpaired_mix_full_tags
 
     # Debugging print statements:
-    #print('NO_BRACKETS: ', no_brackets)
-    #print('UNPAIRED_TAGS_OP: ', unpair_op)
-    #print('UNPAIRED_TAGS_CL: ', unpair_cl)
-    #print('UNPAIRED_TAGS_OP2_FULL_TAGS: ', unpair_op_2_full_tags)
-    #print('UNPAIRED_TAGS_CL2_FULL_TAGS: ', unpair_cl_2_full_tags)
-    #print('UNPAIRED MIX FULL T: ', unpaired_mix_full_tags)
-    #print('UNPAIRED FULL TAGS: ', unpaired_full_tags)
+    # print('NO_BRACKETS: ', no_brackets)
+    # print('UNPAIRED_TAGS_OP: ', unpair_op)
+    # print('UNPAIRED_TAGS_CL: ', unpair_cl)
+    # print('UNPAIRED_TAGS_OP2_FULL_TAGS: ', unpair_op_2_full_tags)
+    # print('UNPAIRED_TAGS_CL2_FULL_TAGS: ', unpair_cl_2_full_tags)
+    # print('UNPAIRED MIX FULL T: ', unpaired_mix_full_tags)
+    # print('UNPAIRED FULL TAGS: ', unpaired_full_tags)
 
     # generate error messages with line numbers and line content
     for tag in unpaired_full_tags:
@@ -693,7 +694,7 @@ def is_nesting_proper(err):
 #  LINE NUMBERS !!!!!!!!!!!!!!!!!!!!!!!!! HOW? DOESN'T NEED LINE NUMBERS?
 def is_number_of_comment_tags_even(err):
     """
-    Check if number of commnt tags is even
+    Check if number of comment tags is even
     - utility function
     :return: boolean
     """
